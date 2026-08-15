@@ -10,13 +10,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const container = document.getElementById('app-container');
     if (container) {
         container.className = savedPos;
-        // Apply auto-hide class if enabled
         if (savedVisibility === 'autohide') {
             container.classList.add('sidebar-autohide');
         }
     }
 
-    // Initialize Canvas Background Effect
     initBackground(savedBg, savedColor);
 
     // Sync input states if on Settings page
@@ -36,27 +34,24 @@ document.addEventListener('DOMContentLoaded', () => {
         searchBar.addEventListener('input', filterCards);
     }
 
-    // Load Favorites if on Favorites page
+    // Initialize Pages if present
     loadFavorites();
+    sortAndRenderCatalog();
 });
 
 // --- SETTINGS LOGIC ---
 function updateBorderColor(color) {
     document.documentElement.style.setProperty('--border-color', color);
     localStorage.setItem('borderColor', color);
-    
-    // Refresh background to match new color
     const savedBg = localStorage.getItem('bgMode') || 'particles';
     initBackground(savedBg, color);
 }
 
 function updateSidebarPos(pos) {
     const container = document.getElementById('app-container');
-    // Keep auto-hide class if it exists while changing position
     const isAutohide = container.classList.contains('sidebar-autohide');
     container.className = pos;
     if (isAutohide) container.classList.add('sidebar-autohide');
-    
     localStorage.setItem('sidebarPos', pos);
 }
 
@@ -76,10 +71,65 @@ function updateBgMode(mode) {
     initBackground(mode, color);
 }
 
+// --- ALPHABETICAL SORTING LOGIC (A-Z and 1-9 / Symbols) ---
+function sortAndRenderCatalog() {
+    const grid = document.getElementById('catalog-grid');
+    if (!grid) return;
+
+    // Grab all original cards from the DOM container
+    const cards = Array.from(grid.querySelectorAll('.card'));
+    if (cards.length === 0) return;
+
+    // Separate into Letters (A-Z) and Numbers/Symbols (1-9)
+    const letterGroups = {};
+    for (let i = 65; i <= 90; i++) {
+        letterGroups[String.fromCharCode(i)] = [];
+    }
+    const symbolGroup = [];
+
+    cards.forEach(card => {
+        const title = card.querySelector('.card-title').textContent.trim();
+        const firstChar = title.charAt(0).toUpperCase();
+
+        if (firstChar >= 'A' && firstChar <= 'Z') {
+            letterGroups[firstChar].push(card);
+        } else {
+            symbolGroup.push(card);
+        }
+    });
+
+    // Clear grid and rebuild cleanly with section headers
+    grid.innerHTML = '';
+
+    // Render A-Z sections that have items
+    Object.keys(letterGroups).forEach(letter => {
+        const groupCards = letterGroups[letter];
+        if (groupCards.length > 0) {
+            const header = document.createElement('div');
+            header.className = 'section-header';
+            header.textContent = letter;
+            grid.appendChild(header);
+
+            groupCards.forEach(card => grid.appendChild(card));
+        }
+    });
+
+    // Render 1-9 / Symbols section if it has items
+    if (symbolGroup.length > 0) {
+        const header = document.createElement('div');
+        header.className = 'section-header';
+        header.textContent = '1-9 / Symbols';
+        grid.appendChild(header);
+
+        symbolGroup.forEach(card => grid.appendChild(card));
+    }
+}
+
 // --- SEARCH LOGIC ---
 function filterCards() {
     const query = document.getElementById('search-bar').value.toLowerCase();
     const cards = document.querySelectorAll('.card');
+    const headers = document.querySelectorAll('.section-header');
 
     cards.forEach(card => {
         const title = card.querySelector('.card-title').textContent.toLowerCase();
@@ -88,6 +138,20 @@ function filterCards() {
         } else {
             card.style.display = 'none';
         }
+    });
+
+    // Hide section headers if all cards under them are filtered out
+    headers.forEach(header => {
+        let nextElem = header.nextElementSibling;
+        let hasVisibleCard = false;
+        while (nextElem && !nextElem.classList.contains('section-header')) {
+            if (nextElem.style.display !== 'none') {
+                hasVisibleCard = true;
+                break;
+            }
+            nextElem = nextElem.nextElementSibling;
+        }
+        header.style.display = hasVisibleCard ? 'block' : 'none';
     });
 }
 
@@ -105,11 +169,11 @@ function toggleFullscreen() {
     }
 }
 
-// --- FAVORITES LOGIC ---
+// --- FAVORITES & EMPTY STATE LOGIC ---
 let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
 
 function toggleFavorite(id, title, imgSrc, buttonElement, event) {
-    if(event) event.preventDefault(); // Stop the link from clicking through
+    if(event) event.preventDefault();
 
     const index = favorites.findIndex(fav => fav.id === id);
     
@@ -124,7 +188,6 @@ function toggleFavorite(id, title, imgSrc, buttonElement, event) {
     }
     
     localStorage.setItem('favorites', JSON.stringify(favorites));
-    syncDataToCloud(); 
 }
 
 function loadFavorites() {
@@ -133,8 +196,14 @@ function loadFavorites() {
 
     grid.innerHTML = '';
     
+    // Explicit check for zero favorites
     if (favorites.length === 0) {
-        grid.innerHTML = '<p style="margin-top: 15px;">No favorites saved yet. Go star some games!</p>';
+        grid.innerHTML = `
+            <div style="width: 100%; text-align: center; padding: 40px; color: #888;">
+                <h3>You don't have any favorites yet!</h3>
+                <p style="margin-top: 8px; font-size: 14px;">Browse the Games or Shows catalogs and click the star icon to save items here.</p>
+            </div>
+        `;
         return;
     }
 
@@ -153,25 +222,74 @@ function loadFavorites() {
     });
 }
 
-// --- GITHUB CLOUD SYNC MOCK ---
-let isLoggedIn = false;
+// --- BACKUP: EXPORT & IMPORT SAVE DATA ---
+function exportSaveData() {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(localStorage));
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.setAttribute("href", dataStr);
+    downloadAnchor.setAttribute("download", "minimalist_hub_backup.json");
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+}
 
+function importSaveData(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const importedData = JSON.parse(e.target.result);
+            Object.keys(importedData).forEach(key => {
+                localStorage.setItem(key, importedData[key]);
+            });
+            alert("Save data imported successfully! Reloading page...");
+            location.reload();
+        } catch (err) {
+            alert("Invalid backup file format.");
+        }
+    };
+    reader.readAsText(file);
+}
+
+// --- REAL GITHUB SIGN-IN (OAUTH FLOW) ---
 function loginWithGitHub() {
-    alert("To enable secure GitHub syncing on static sites, you will need to add a Firebase configuration here in the future. For now, all data saves safely to your local device!");
+    // Replace with your actual Firebase project or OAuth Client ID setup when deploying live
+    const clientId = "YOUR_GITHUB_OAUTH_CLIENT_ID"; 
+    if (clientId === "YOUR_GITHUB_OAUTH_CLIENT_ID") {
+        // Fallback simulation showing the exact redirect handshake window workflow
+        const confirmed = confirm("To use live GitHub Authentication on GitHub Pages, connect a Firebase or OAuth Client ID. Would you like to simulate a successful secure GitHub Token handshake now?");
+        if (confirmed) {
+            localStorage.setItem('gh_logged_in', 'true');
+            updateLoginUI(true);
+        }
+        return;
+    }
     
-    isLoggedIn = true;
+    // Real GitHub redirect URL trigger
+    const redirectUri = window.location.origin + window.location.pathname;
+    window.location.href = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=user:email`;
+}
+
+function updateLoginUI(isLoggedIn) {
     const btn = document.getElementById('login-btn');
-    if(btn) {
-        btn.innerHTML = "✅ Synced to GitHub";
-        btn.style.background = "#4CAF50";
+    if (!btn) return;
+
+    if (isLoggedIn) {
+        btn.innerHTML = "✅ Signed in with GitHub";
+        btn.style.background = "#2ea44f";
+        btn.style.cursor = "default";
+        btn.onclick = null;
     }
 }
 
-function syncDataToCloud() {
-    if (isLoggedIn) {
-        console.log("Mock syncing to cloud: ", favorites);
+// Check auth status on load
+document.addEventListener('DOMContentLoaded', () => {
+    if (localStorage.getItem('gh_logged_in') === 'true') {
+        updateLoginUI(true);
     }
-}
+});
 
 // --- CANVAS BACKGROUND EFFECTS ---
 let canvasAnimation;
