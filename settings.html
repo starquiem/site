@@ -3,84 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Settings - Minimalist Hub</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Minimalist Hub - Settings</title>
+    <link rel="stylesheet" href="./style.css">
 </head>
 <body>
+
+    <div id="loader-overlay">
+        <div class="loader-title">LOADING SETTINGS...</div>
+        <div class="loader-bar-container">
+            <div id="loader-bar" class="loader-bar"></div>
+        </div>
+    </div>
+
     <canvas id="bg-canvas"></canvas>
-    
+
     <div id="app-container" class="sidebar-left">
         <nav class="nav-bar">
-            <a href="index.html" class="nav-link">Home</a>
-            <a href="games.html" class="nav-link">Games</a>
-            <a href="shows.html" class="nav-link">Shows</a>
-            <a href="favorites.html" class="nav-link">⭐ Favs</a>
-            <a href="settings.html" class="nav-link active">⚙️</a>
+            <a href="index.html" class="nav-link" id="nav-index" title="Catalog">
+                <svg viewBox="0 0 24 24" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+            </a>
+            <a href="favorites.html" class="nav-link" id="nav-favorites" title="Favorites">
+                <svg viewBox="0 0 24 24" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+            </a>
+            <a href="settings.html" class="nav-link" id="nav-settings" title="Settings">
+                <svg viewBox="0 0 24 24" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+            </a>
         </nav>
 
         <main class="content">
-            <h2>Settings</h2>
-            
-            <div class="setting-group">
-                <label for="theme-select">Interface Theme:</label><br>
-                <select id="theme-select" onchange="window.updateTheme(this.value)">
-                    <option value="dark">Dark Mode</option>
-                    <option value="light">Light Mode</option>
-                </select>
-            </div>
+            <div class="section-header">Settings & Customization</div>
 
-            <div class="setting-group">
-                <label for="pos-select">Navigation Layout:</label><br>
-                <select id="pos-select" onchange="window.updateSidebarPos(this.value)">
-                    <option value="sidebar-left">Left Side</option>
-                    <option value="sidebar-right">Right Side</option>
-                    <option value="sidebar-bottom">Bottom Bar</option>
-                </select>
-            </div>
+            <div class="settings-section">
+                <div class="settings-group">
+                    <label for="color-picker">Accent & Border Color</label>
+                    <input type="color" id="color-picker" value="#4CAF50">
+                </div>
 
-            <div class="setting-group">
-                <label for="visibility-select">Sidebar Visibility:</label><br>
-                <select id="visibility-select" onchange="window.updateSidebarVisibility(this.value)">
-                    <option value="always">Always Visible</option>
-                    <option value="autohide">Fade In on Hover</option>
-                </select>
-            </div>
+                <div class="settings-group">
+                    <label for="theme-select">Theme Mode</label>
+                    <select id="theme-select">
+                        <option value="dark">Dark Mode</option>
+                        <option value="light">Light Mode</option>
+                    </select>
+                </div>
 
-            <div class="setting-group">
-                <label for="bg-select">Background Animation:</label><br>
-                <select id="bg-select" onchange="window.updateBgMode(this.value)">
-                    <option value="particles">Floating Particles</option>
-                    <option value="matrix">Matrix Rain</option>
-                    <option value="snow">Gentle Snow</option>
-                    <option value="fireflies">Glowing Fireflies</option>
-                    <option value="none">Solid Background</option>
-                </select>
-            </div>
+                <div class="settings-group">
+                    <label for="pos-select">Sidebar Position</label>
+                    <select id="pos-select">
+                        <option value="sidebar-left">Left</option>
+                        <option value="sidebar-right">Right</option>
+                    </select>
+                </div>
 
-            <div class="setting-group">
-                <label for="color-picker">Accent Border Color:</label><br>
-                <input type="color" id="color-picker" onchange="window.updateBorderColor(this.value)">
-            </div>
+                <div class="settings-group">
+                    <label for="visibility-select">Sidebar Visibility</label>
+                    <select id="visibility-select">
+                        <option value="always">Always Visible</option>
+                        <option value="autohide">Auto-Hide on Hover</option>
+                    </select>
+                </div>
 
-            <div class="setting-group">
-                <label>Save Data Backup:</label>
-                <p style="font-size: 12px; color: #888; margin-top: 5px;">Export settings & favorites or restore a backup file.</p>
-                <div class="data-controls">
-                    <button class="data-btn" onclick="window.exportSaveData()">📤 Export Save</button>
-                    <button class="data-btn" onclick="document.getElementById('import-file').click()">📥 Import Save</button>
-                    <input type="file" id="import-file" style="display: none;" accept=".json" onchange="window.importSaveData(event)">
+                <div class="settings-group">
+                    <label for="bg-select">Background Animation</label>
+                    <select id="bg-select">
+                        <option value="particles">Particles</option>
+                        <option value="none">None</option>
+                    </select>
                 </div>
             </div>
 
-            <div class="setting-group">
-                <label>Cloud Authentication:</label>
-                <button id="login-btn" class="github-btn" onclick="window.loginWithGitHub()">
-                    Sign in with GitHub
-                </button>
+            <div class="settings-section">
+                <div class="settings-group">
+                    <label>Save Data Backup</label>
+                    <button class="btn-primary" onclick="exportSaveData()">Export Backup (.json)</button>
+                </div>
+                <div class="settings-group">
+                    <label for="import-file">Restore Save Data</label>
+                    <input type="file" id="import-file" accept=".json" onchange="importSaveData(event)">
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <div class="settings-group">
+                    <label>Account Integration</label>
+                    <button id="login-btn" class="btn-primary" onclick="loginWithGitHub()">Sign in with GitHub</button>
+                </div>
             </div>
         </main>
     </div>
 
-    <script type="module" src="script.js"></script>
+    <script type="module" src="./script.js"></script>
 </body>
 </html>
