@@ -1,3 +1,5 @@
+// --- Full script.js for Minimalist Hub ---
+
 document.addEventListener('DOMContentLoaded', () => {
     // 1. Load saved settings
     const savedColor = localStorage.getItem('borderColor') || '#4CAF50';
@@ -58,6 +60,13 @@ document.addEventListener('DOMContentLoaded', () => {
     setupGlobalEventListeners();
     
     if (localStorage.getItem('gh_logged_in') === 'true') updateLoginUI(true);
+});
+
+// Ensure canvas initializes correctly across all hosting environments (GitHub Pages & local)
+window.addEventListener('load', () => {
+    const savedBg = localStorage.getItem('bgMode') || 'particles';
+    const savedColor = localStorage.getItem('borderColor') || '#4CAF50';
+    initBackground(savedBg, savedColor);
 });
 
 // --- Settings Functions ---
