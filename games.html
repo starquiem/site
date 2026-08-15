@@ -42,8 +42,23 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Add more cards following the format above -->
+                
+                <!-- Example Game Card 2 -->
+                <div class="card">
+                    <button class="fav-btn" onclick="window.toggleFavorite('game-minecraft', 'Minecraft Classic', 'https://via.placeholder.com/300x200', this, event)">☆</button>
+                    <a href="play.html?src=https://classic.minecraft.net/&id=game-minecraft" style="text-decoration: none; color: inherit; display: flex; flex-direction: column; flex: 1;">
+                        <div class="card-img-container">
+                            <img src="https://via.placeholder.com/300x200" alt="Minecraft Classic">
+                        </div>
+                        <div class="card-title">Minecraft Classic</div>
+                    </a>
+                    <div class="card-actions" data-game-id="game-minecraft">
+                        <div class="rating-group">
+                            <button class="rate-btn rate-like" onclick="window.handleRating('game-minecraft', 'like', this, event)">👍 0</button>
+                            <button class="rate-btn rate-dislike" onclick="window.handleRating('game-minecraft', 'dislike', this, event)">👎 0</button>
+                        </div>
+                    </div>
+                </div>
 
             </div>
         </main>
