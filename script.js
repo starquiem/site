@@ -1,5 +1,17 @@
 // script.js - Unified Hub Logic
 
+// Sample Master Catalog Data
+const masterCatalog = {
+    games: [
+        { id: 'game-1v1lol', title: '1v1.lol', img: 'https://via.placeholder.com/300x200', src: 'https://example.com/1v1', category: 'games' },
+        { id: 'game-sample2', title: 'Sample Game 2', img: 'https://via.placeholder.com/300x200', src: 'https://example.com/game2', category: 'games' }
+    ],
+    media: [
+        { id: 'media-show1', title: 'Sample Show 1', img: 'https://via.placeholder.com/300x200', src: 'https://example.com/show1', category: 'media' },
+        { id: 'media-show2', title: 'Sample Show 2', img: 'https://via.placeholder.com/300x200', src: 'https://example.com/show2', category: 'media' }
+    ]
+};
+
 document.addEventListener('DOMContentLoaded', () => {
     // 1. Safe Loader Overlay Handler (with robust failsafe)
     const loaderOverlay = document.getElementById('loader-overlay');
@@ -19,7 +31,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }, 30);
 
-        // Absolute failsafe: removes loader after 1 second guaranteed so you never get stuck
         setTimeout(() => {
             clearInterval(interval);
             if (loaderOverlay && loaderOverlay.parentNode) {
@@ -52,20 +63,86 @@ document.addEventListener('DOMContentLoaded', () => {
     // 3. Background Canvas Animation
     initCanvas();
 
-    // 4. Dynamic Content (Recent & Favorites)
+    // 4. Load Content Grids based on current page
+    loadContentGrid();
     loadRecentlyPlayed();
     loadFavoritesGrid();
 
-    // 5. Functional GitHub Sign-In System
+    // 5. Search Bar Functionality
+    initSearch();
+
+    // 6. GitHub Sign-In System
     initGitHubAuth();
 });
+
+// --- Dynamic Content Grids ---
+function loadContentGrid() {
+    const grid = document.getElementById('content-grid');
+    if (!grid) return;
+
+    // Determine if we are on games.html or media.html based on filename or URL
+    const path = window.location.pathname;
+    let items = [];
+
+    if (path.includes('games.html')) {
+        items = masterCatalog.games;
+    } else if (path.includes('media.html')) {
+        items = masterCatalog.media;
+    } else {
+        // Default or Index catalog combines both
+        items = [...masterCatalog.games, ...masterCatalog.media];
+    }
+
+    renderCards(grid, items);
+}
+
+function renderCards(container, items) {
+    const favorites = JSON.parse(localStorage.getItem('hub_favorites')) || [];
+
+    if (items.length === 0) {
+        container.innerHTML = `<div style="color: var(--text-muted); font-size: 0.9rem; padding: 20px 0;">No items found.</div>`;
+        return;
+    }
+
+    container.innerHTML = items.map(item => {
+        const isFav = favorites.includes(item.id);
+        return `
+            <div class="card" data-title="${item.title.toLowerCase()}">
+                <button class="fav-btn ${isFav ? 'active' : ''}" onclick="toggleFavorite(event, '${item.id}')">${isFav ? '★' : '☆'}</button>
+                <a href="./play.html?src=${encodeURIComponent(item.src)}&title=${encodeURIComponent(item.title)}&id=${item.id}" onclick="trackRecent('${item.title}', '${item.img}', '${item.src}', '${item.id}')" style="text-decoration: none; color: inherit; display: flex; flex-direction: column; flex: 1;">
+                    <div class="card-img-container"><img src="${item.img}" alt="${item.title}"></div>
+                    <div class="card-title">${item.title}</div>
+                </a>
+            </div>
+        `;
+    }).join('');
+}
+
+// --- Search Bar Filter ---
+function initSearch() {
+    const searchInput = document.getElementById('searchInput');
+    if (!searchInput) return;
+
+    searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase().trim();
+        const cards = document.querySelectorAll('#content-grid .card');
+
+        cards.forEach(card => {
+            const title = card.getAttribute('data-title') || '';
+            if (title.includes(query)) {
+                card.style.display = 'flex';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    });
+}
 
 // --- GitHub Auth System ---
 function initGitHubAuth() {
     const githubBtn = document.getElementById('github-login-btn');
     if (!githubBtn) return;
 
-    // Check if user is already logged in
     const session = JSON.parse(localStorage.getItem('hub_user_session'));
     if (session) {
         githubBtn.textContent = `Logged in as ${session.username} (Logout)`;
@@ -76,14 +153,11 @@ function initGitHubAuth() {
         const currentSession = JSON.parse(localStorage.getItem('hub_user_session'));
         
         if (currentSession) {
-            // Log out action
             localStorage.removeItem('hub_user_session');
             githubBtn.textContent = 'Sign in with GitHub';
             githubBtn.style.background = '';
             alert('Successfully logged out!');
         } else {
-            // Log in simulation / OAuth redirect
-            // For a static site without a backend, this simulates a successful GitHub login session
             const username = prompt('Enter your GitHub username to sign in:');
             if (username && username.trim() !== '') {
                 const newSession = { username: username.trim(), avatar: `https://github.com/${username.trim()}.png` };
@@ -126,27 +200,22 @@ function loadFavoritesGrid() {
     const favorites = JSON.parse(localStorage.getItem('hub_favorites')) || [];
     
     if (favorites.length === 0) {
-        favGrid.innerHTML = `<div style="color: var(--text-muted); font-size: 0.9rem; padding: 10px 0;">No favorite games or shows added yet. Click the star icon on any card to save it here!</div>`;
+        favGrid.innerHTML = `<div style="color: var(--text-muted); font-size: 0.9rem; padding: 10px 0;">No favorite games or media added yet. Click the star icon on any card to save it here!</div>`;
         return;
     }
 
-    const catalog = {
-        'game-1v1lol': { title: '1v1.lol', img: 'https://via.placeholder.com/300x200', src: 'https://example.com' },
-        'game-sample2': { title: 'Sample Game 2', img: 'https://via.placeholder.com/300x200', src: 'https://example.com' }
-    };
+    const allItems = [...masterCatalog.games, ...masterCatalog.media];
+    const favoriteItems = allItems.filter(item => favorites.includes(item.id));
 
-    favGrid.innerHTML = favorites.map(id => {
-        const item = catalog[id] || { title: id, img: 'https://via.placeholder.com/300x200', src: '#' };
-        return `
-            <div class="card" data-game-id="${id}">
-                <button class="fav-btn active" onclick="toggleFavorite(event, '${id}')">★</button>
-                <a href="./play.html?src=${encodeURIComponent(item.src)}&title=${encodeURIComponent(item.title)}&id=${id}" onclick="trackRecent('${item.title}', '${item.img}', '${item.src}', '${id}')" style="text-decoration: none; color: inherit; display: flex; flex-direction: column; flex: 1;">
-                    <div class="card-img-container"><img src="${item.img}" alt="${item.title}"></div>
-                    <div class="card-title">${item.title}</div>
-                </a>
-            </div>
-        `;
-    }).join('');
+    favGrid.innerHTML = favoriteItems.map(item => `
+        <div class="card" data-game-id="${item.id}">
+            <button class="fav-btn active" onclick="toggleFavorite(event, '${item.id}')">★</button>
+            <a href="./play.html?src=${encodeURIComponent(item.src)}&title=${encodeURIComponent(item.title)}&id=${item.id}" onclick="trackRecent('${item.title}', '${item.img}', '${item.src}', '${item.id}')" style="text-decoration: none; color: inherit; display: flex; flex-direction: column; flex: 1;">
+                <div class="card-img-container"><img src="${item.img}" alt="${item.title}"></div>
+                <div class="card-title">${item.title}</div>
+            </a>
+        </div>
+    `).join('');
 }
 
 // --- Recently Played Tracking ---
@@ -164,7 +233,7 @@ function loadRecentlyPlayed() {
     const recent = JSON.parse(localStorage.getItem('hub_recent')) || [];
     
     if (recent.length === 0) {
-        recentGrid.innerHTML = `<div style="color: var(--text-muted); font-size: 0.9rem; padding: 10px 0;">No recently played games yet. Jump into one below!</div>`;
+        recentGrid.innerHTML = `<div style="color: var(--text-muted); font-size: 0.9rem; padding: 10px 0;">No recently played items yet. Jump into one below!</div>`;
         return;
     }
 
