@@ -1,14 +1,12 @@
 // script.js - Unified Hub Logic
 
-// Sample Master Catalog Data
+// Master Catalog (Empty - add your actual games and media links here)
 const masterCatalog = {
     games: [
-        { id: 'game-1v1lol', title: '1v1.lol', img: 'https://via.placeholder.com/300x200', src: 'https://example.com/1v1', category: 'games' },
-        { id: 'game-sample2', title: 'Sample Game 2', img: 'https://via.placeholder.com/300x200', src: 'https://example.com/game2', category: 'games' }
+        // Example format: { id: 'game-1', title: 'Game Name', img: 'URL', src: 'EMBED_URL', category: 'games' }
     ],
     media: [
-        { id: 'media-show1', title: 'Sample Show 1', img: 'https://via.placeholder.com/300x200', src: 'https://example.com/show1', category: 'media' },
-        { id: 'media-show2', title: 'Sample Show 2', img: 'https://via.placeholder.com/300x200', src: 'https://example.com/show2', category: 'media' }
+        // Example format: { id: 'media-1', title: 'Media Name', img: 'URL', src: 'EMBED_URL', category: 'media' }
     ]
 };
 
@@ -40,25 +38,39 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 1000);
     }
 
-    // 2. Theme Management across all pages
-    const themeSelect = document.getElementById('theme-select');
+    // 2. Theme Management via HTML Buttons
     const savedTheme = localStorage.getItem('theme') || 'dark';
-
+    
     if (savedTheme !== 'dark') {
         document.body.classList.add(savedTheme);
     }
 
-    if (themeSelect) {
-        themeSelect.value = savedTheme;
-        themeSelect.addEventListener('change', (e) => {
-            const selected = e.target.value;
-            document.body.classList.remove('light-mode', 'hacker-mode', 'sakura-mode');
-            if (selected !== 'dark') {
-                document.body.classList.add(selected);
+    const themeButtons = document.querySelectorAll('.theme-btn');
+    themeButtons.forEach(btn => {
+        const themeName = btn.getAttribute('data-theme');
+        
+        if (themeName === savedTheme || (savedTheme === 'dark' && themeName === 'dark')) {
+            btn.style.borderColor = 'var(--accent-color, #6c5ce7)';
+            btn.style.background = 'rgba(108, 92, 231, 0.2)';
+        }
+
+        btn.addEventListener('click', () => {
+            document.body.classList.remove('light-mode', 'hacker-mode', 'sakura-mode', 'synthwave-mode');
+            
+            if (themeName !== 'dark') {
+                document.body.classList.add(themeName);
             }
-            localStorage.setItem('theme', selected);
+            
+            localStorage.setItem('theme', themeName);
+
+            themeButtons.forEach(b => {
+                b.style.borderColor = 'rgba(255,255,255,0.1)';
+                b.style.background = 'rgba(255,255,255,0.05)';
+            });
+            btn.style.borderColor = 'var(--accent-color, #6c5ce7)';
+            btn.style.background = 'rgba(108, 92, 231, 0.2)';
         });
-    }
+    });
 
     // 3. Background Canvas Animation
     initCanvas();
@@ -80,7 +92,6 @@ function loadContentGrid() {
     const grid = document.getElementById('content-grid');
     if (!grid) return;
 
-    // Determine if we are on games.html or media.html based on filename or URL
     const path = window.location.pathname;
     let items = [];
 
@@ -89,7 +100,6 @@ function loadContentGrid() {
     } else if (path.includes('media.html')) {
         items = masterCatalog.media;
     } else {
-        // Default or Index catalog combines both
         items = [...masterCatalog.games, ...masterCatalog.media];
     }
 
@@ -100,7 +110,7 @@ function renderCards(container, items) {
     const favorites = JSON.parse(localStorage.getItem('hub_favorites')) || [];
 
     if (items.length === 0) {
-        container.innerHTML = `<div style="color: var(--text-muted); font-size: 0.9rem; padding: 20px 0;">No items found.</div>`;
+        container.innerHTML = `<div style="color: var(--text-muted); font-size: 0.95rem; padding: 20px 0; grid-column: 1 / -1;">No items available yet. Add items to your catalog in script.js!</div>`;
         return;
     }
 
@@ -200,7 +210,7 @@ function loadFavoritesGrid() {
     const favorites = JSON.parse(localStorage.getItem('hub_favorites')) || [];
     
     if (favorites.length === 0) {
-        favGrid.innerHTML = `<div style="color: var(--text-muted); font-size: 0.9rem; padding: 10px 0;">No favorite games or media added yet. Click the star icon on any card to save it here!</div>`;
+        favGrid.innerHTML = `<div style="color: var(--text-muted); font-size: 0.9rem; padding: 10px 0;">No favorite items added yet. Click the star icon on any card to save it here!</div>`;
         return;
     }
 
