@@ -10,12 +10,13 @@
     <canvas id="bg-canvas"></canvas>
     
     <div id="app-container" class="sidebar-left">
+        <!-- Glassmorphism Icon Sidebar -->
         <nav class="nav-bar">
-            <a href="index.html" class="nav-link" title="Home" aria-label="Home">🏠</a>
-            <a href="games.html" class="nav-link" title="Games" aria-label="Games">🎮</a>
-            <a href="shows.html" class="nav-link" title="Shows" aria-label="Shows">📺</a>
-            <a href="favorites.html" class="nav-link" title="Favorites" aria-label="Favorites">⭐</a>
-            <a href="settings.html" class="nav-link" title="Settings" aria-label="Settings">⚙️</a>
+            <a href="index.html" class="nav-link" title="Home">🏠</a>
+            <a href="games.html" class="nav-link" title="Games">🎮</a>
+            <a href="shows.html" class="nav-link" title="Shows">📺</a>
+            <a href="favorites.html" class="nav-link" title="Favorites">⭐</a>
+            <a href="settings.html" class="nav-link" title="Settings">⚙️</a>
         </nav>
 
         <main class="content">
@@ -23,24 +24,40 @@
                 <div class="iframe-wrapper">
                     <iframe id="game-frame" src="about:blank" allow="fullscreen; autoplay; gamepad; clipboard-write"></iframe>
                 </div>
+                
+                <!-- Modern Action Bar with Ratings -->
                 <div class="action-bar">
                     <button class="btn-primary" onclick="window.history.back()">← Back</button>
+                    
+                    <div class="rating-group card-actions" data-game-id="current-game" id="play-rating">
+                        <button class="rate-btn rate-like" onclick="window.handleRating('current-game', 'like', this, event)">👍 0</button>
+                        <button class="rate-btn rate-dislike" onclick="window.handleRating('current-game', 'dislike', this, event)">👎 0</button>
+                    </div>
+
                     <button class="btn-primary" onclick="window.toggleFullscreen()">Fullscreen ⛶</button>
                 </div>
             </div>
         </main>
     </div>
 
-    <!-- Direct URL parser ensures iframe loads instantly -->
     <script>
+        // Auto-loads game from URL instantly
         (function() {
             const params = new URLSearchParams(window.location.search);
             const gameSrc = params.get('src');
+            const gameId = params.get('id') || 'current-game';
+            
             if (gameSrc) {
                 window.addEventListener('DOMContentLoaded', () => {
                     const frame = document.getElementById('game-frame');
-                    if (frame) {
-                        frame.src = decodeURIComponent(gameSrc);
+                    if (frame) frame.src = decodeURIComponent(gameSrc);
+                    
+                    // Set the rating ID to match the game
+                    const ratingContainer = document.getElementById('play-rating');
+                    if (ratingContainer) {
+                        ratingContainer.setAttribute('data-game-id', gameId);
+                        ratingContainer.querySelector('.rate-like').setAttribute('onclick', `window.handleRating('${gameId}', 'like', this, event)`);
+                        ratingContainer.querySelector('.rate-dislike').setAttribute('onclick', `window.handleRating('${gameId}', 'dislike', this, event)`);
                     }
                 });
             }
