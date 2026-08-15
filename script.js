@@ -1,34 +1,32 @@
 // script.js - Unified Hub Logic
 
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Loader Overlay Handler with Failsafe
+    // 1. Safe Loader Overlay Handler (with robust failsafe)
     const loaderOverlay = document.getElementById('loader-overlay');
     const loaderBar = document.getElementById('loader-bar');
     
     if (loaderOverlay) {
         let width = 0;
         const interval = setInterval(() => {
-            width += 25;
-            if (loaderBar) loaderBar.style.width = width + '%';
+            width += 33;
+            if (loaderBar) loaderBar.style.width = Math.min(width, 100) + '%';
             if (width >= 100) {
                 clearInterval(interval);
-                loaderOverlay.classList.add('fade-out');
                 setTimeout(() => {
-                    if (loaderOverlay.parentNode) loaderOverlay.remove();
-                }, 400);
+                    loaderOverlay.classList.add('fade-out');
+                    setTimeout(() => loaderOverlay.remove(), 400);
+                }, 200);
             }
-        }, 40);
+        }, 30);
 
-        // Failsafe: Guaranteed removal after 1.5 seconds so you never get stuck
+        // Absolute failsafe: removes loader after 1 second guaranteed so you never get stuck
         setTimeout(() => {
             clearInterval(interval);
             if (loaderOverlay && loaderOverlay.parentNode) {
                 loaderOverlay.classList.add('fade-out');
-                setTimeout(() => {
-                    if (loaderOverlay.parentNode) loaderOverlay.remove();
-                }, 400);
+                setTimeout(() => loaderOverlay.remove(), 400);
             }
-        }, 1500);
+        }, 1000);
     }
 
     // 2. Theme Management across all pages
@@ -54,18 +52,49 @@ document.addEventListener('DOMContentLoaded', () => {
     // 3. Background Canvas Animation
     initCanvas();
 
-    // 4. Load Dynamic Content (Recent & Favorites)
+    // 4. Dynamic Content (Recent & Favorites)
     loadRecentlyPlayed();
     loadFavoritesGrid();
 
-    // 5. GitHub Sign-In Button Action
-    const githubBtn = document.getElementById('github-login-btn');
-    if (githubBtn) {
-        githubBtn.addEventListener('click', () => {
-            alert('GitHub sign-in triggered! Connect your OAuth redirect URL or backend service here.');
-        });
-    }
+    // 5. Functional GitHub Sign-In System
+    initGitHubAuth();
 });
+
+// --- GitHub Auth System ---
+function initGitHubAuth() {
+    const githubBtn = document.getElementById('github-login-btn');
+    if (!githubBtn) return;
+
+    // Check if user is already logged in
+    const session = JSON.parse(localStorage.getItem('hub_user_session'));
+    if (session) {
+        githubBtn.textContent = `Logged in as ${session.username} (Logout)`;
+        githubBtn.style.background = 'var(--accent-success, #2ea043)';
+    }
+
+    githubBtn.addEventListener('click', () => {
+        const currentSession = JSON.parse(localStorage.getItem('hub_user_session'));
+        
+        if (currentSession) {
+            // Log out action
+            localStorage.removeItem('hub_user_session');
+            githubBtn.textContent = 'Sign in with GitHub';
+            githubBtn.style.background = '';
+            alert('Successfully logged out!');
+        } else {
+            // Log in simulation / OAuth redirect
+            // For a static site without a backend, this simulates a successful GitHub login session
+            const username = prompt('Enter your GitHub username to sign in:');
+            if (username && username.trim() !== '') {
+                const newSession = { username: username.trim(), avatar: `https://github.com/${username.trim()}.png` };
+                localStorage.setItem('hub_user_session', JSON.stringify(newSession));
+                githubBtn.textContent = `Logged in as ${newSession.username} (Logout)`;
+                githubBtn.style.background = 'var(--accent-success, #2ea043)';
+                alert(`Welcome, ${newSession.username}! You are now signed in.`);
+            }
+        }
+    });
+}
 
 // --- Favorites System ---
 window.toggleFavorite = function(event, gameId) {
