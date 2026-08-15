@@ -9,7 +9,7 @@
 <body>
 
     <div id="loader-overlay">
-        <div class="loader-title">LOADING MEDIA...</div>
+        <div class="loader-title">LOADING GAME...</div>
         <div class="loader-bar-container">
             <div id="loader-bar" class="loader-bar"></div>
         </div>
@@ -51,22 +51,45 @@
             </a>
         </nav>
 
-        <main class="content">
-            <div class="play-container">
-                <div class="iframe-wrapper">
-                    <iframe id="game-frame" allowfullscreen></iframe>
+        <main class="content player-content">
+            <div class="player-header">
+                <a href="./index.html" class="btn-primary">&larr; Back</a>
+                <h2 id="game-title">Loading Game...</h2>
+                <div class="player-actions">
+                    <button id="fullscreen-btn" class="btn-primary" onclick="toggleFullscreen()">Fullscreen</button>
                 </div>
-                <div class="action-bar">
-                    <div id="play-rating" class="rating-group" data-game-id="current-game">
-                        <button class="rate-btn rate-like">👍 0</button>
-                        <button class="rate-btn rate-dislike">👎 0</button>
-                    </div>
-                    <button id="fullscreen-btn" class="btn-primary">Fullscreen ⛶</button>
-                </div>
+            </div>
+
+            <div class="game-frame-wrapper" id="frame-wrapper">
+                <iframe id="game-iframe" src="" allowfullscreen></iframe>
             </div>
         </main>
     </div>
 
     <script type="module" src="./script.js"></script>
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const src = urlParams.get('src');
+            const title = urlParams.get('title') || 'Game Player';
+
+            document.getElementById('game-title').textContent = title;
+            if (src) {
+                document.getElementById('game-iframe').src = decodeURIComponent(src);
+            } else {
+                document.getElementById('game-iframe').src = 'about:blank';
+                document.getElementById('game-title').textContent = 'No game source provided.';
+            }
+        });
+
+        function toggleFullscreen() {
+            const wrapper = document.getElementById('frame-wrapper');
+            if (!document.fullscreenElement) {
+                if (wrapper.requestFullscreen) wrapper.requestFullscreen();
+            } else {
+                if (document.exitFullscreen) document.exitFullscreen();
+            }
+        }
+    </script>
 </body>
 </html>
