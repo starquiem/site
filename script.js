@@ -2,16 +2,15 @@
 
 // Master Catalog (Empty - add your actual games and media links here)
 const masterCatalog = {
-    games: [
-        // Example format: { id: 'game-1', title: 'Game Name', img: 'URL', src: 'EMBED_URL', category: 'games' }
-    ],
-    media: [
-        // Example format: { id: 'media-1', title: 'Media Name', img: 'URL', src: 'EMBED_URL', category: 'media' }
-    ]
+    games: [],
+    media: []
 };
 
+// Global canvas animation frame tracker
+let animationFrameId;
+
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Safe Loader Overlay Handler (with robust failsafe)
+    // 1. Safe Loader Overlay
     const loaderOverlay = document.getElementById('loader-overlay');
     const loaderBar = document.getElementById('loader-bar');
     
@@ -38,54 +37,113 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 1000);
     }
 
-    // 2. Theme Management via HTML Buttons
+    // 2. Theme Management via Select Dropdown
+    const themeSelect = document.getElementById('theme-select');
     const savedTheme = localStorage.getItem('theme') || 'dark';
-    
+
     if (savedTheme !== 'dark') {
         document.body.classList.add(savedTheme);
     }
 
-    const themeButtons = document.querySelectorAll('.theme-btn');
-    themeButtons.forEach(btn => {
-        const themeName = btn.getAttribute('data-theme');
-        
-        if (themeName === savedTheme || (savedTheme === 'dark' && themeName === 'dark')) {
-            btn.style.borderColor = 'var(--accent-color, #6c5ce7)';
-            btn.style.background = 'rgba(108, 92, 231, 0.2)';
-        }
-
-        btn.addEventListener('click', () => {
+    if (themeSelect) {
+        themeSelect.value = savedTheme;
+        themeSelect.addEventListener('change', (e) => {
+            const selected = e.target.value;
             document.body.classList.remove('light-mode', 'hacker-mode', 'sakura-mode', 'synthwave-mode');
-            
-            if (themeName !== 'dark') {
-                document.body.classList.add(themeName);
+            if (selected !== 'dark') {
+                document.body.classList.add(selected);
             }
-            
-            localStorage.setItem('theme', themeName);
-
-            themeButtons.forEach(b => {
-                b.style.borderColor = 'rgba(255,255,255,0.1)';
-                b.style.background = 'rgba(255,255,255,0.05)';
-            });
-            btn.style.borderColor = 'var(--accent-color, #6c5ce7)';
-            btn.style.background = 'rgba(108, 92, 231, 0.2)';
+            localStorage.setItem('theme', selected);
         });
-    });
+    }
 
-    // 3. Background Canvas Animation
+    // 3. Particle Settings & Initialization
+    const particleSelect = document.getElementById('particle-select');
+    const savedParticles = localStorage.getItem('hub_particles') || 'default';
+    
+    if (particleSelect) {
+        particleSelect.value = savedParticles;
+        particleSelect.addEventListener('change', (e) => {
+            localStorage.setItem('hub_particles', e.target.value);
+            initCanvas(); // Restart canvas with new settings
+        });
+    }
+
+    // Start background effect
     initCanvas();
 
-    // 4. Load Content Grids based on current page
+    // 4. Load Grids
     loadContentGrid();
     loadRecentlyPlayed();
     loadFavoritesGrid();
-
-    // 5. Search Bar Functionality
     initSearch();
-
-    // 6. GitHub Sign-In System
     initGitHubAuth();
 });
+
+// --- Background Particle Canvas Engine ---
+function initCanvas() {
+    const canvas = document.getElementById('bg-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+
+    // Cancel old animation loop if user changes settings
+    if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+    }
+
+    let width = canvas.width = window.innerWidth;
+    let height = canvas.height = window.innerHeight;
+
+    window.addEventListener('resize', () => {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+    });
+
+    const mode = localStorage.getItem('hub_particles') || 'default';
+
+    if (mode === 'none') {
+        ctx.clearRect(0, 0, width, height);
+        return; // Halt engine
+    }
+
+    let particles = [];
+    let count = mode === 'snow' ? 100 : (mode === 'fast' ? 70 : 40);
+
+    for (let i = 0; i < count; i++) {
+        particles.push({
+            x: Math.random() * width,
+            y: Math.random() * height,
+            vx: mode === 'fast' ? (Math.random() - 0.5) * 8 : (Math.random() - 0.5) * 0.5,
+            vy: mode === 'snow' ? Math.random() * 2 + 1 : (mode === 'fast' ? (Math.random() - 0.5) * 8 : (Math.random() - 0.5) * 0.5),
+            radius: mode === 'snow' ? Math.random() * 2 + 1 : Math.random() * 1.5 + 0.5
+        });
+    }
+
+    function render() {
+        ctx.clearRect(0, 0, width, height);
+        
+        // Snow mode looks better fully solid, otherwise transparent
+        ctx.fillStyle = mode === 'snow' ? 'rgba(255, 255, 255, 0.4)' : 'rgba(255, 255, 255, 0.1)';
+
+        particles.forEach(p => {
+            p.x += p.vx;
+            p.y += p.vy;
+
+            // Wrapping boundaries
+            if (p.x < 0) p.x = width;
+            if (p.x > width) p.x = 0;
+            if (p.y < 0) p.y = height;
+            if (p.y > height) p.y = 0;
+
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+            ctx.fill();
+        });
+
+        animationFrameId = requestAnimationFrame(render);
+    }
+    render();
+}
 
 // --- Dynamic Content Grids ---
 function loadContentGrid() {
@@ -157,6 +215,8 @@ function initGitHubAuth() {
     if (session) {
         githubBtn.textContent = `Logged in as ${session.username} (Logout)`;
         githubBtn.style.background = 'var(--accent-success, #2ea043)';
+        githubBtn.style.borderColor = 'var(--accent-success, #2ea043)';
+        githubBtn.style.color = '#fff';
     }
 
     githubBtn.addEventListener('click', () => {
@@ -165,7 +225,8 @@ function initGitHubAuth() {
         if (currentSession) {
             localStorage.removeItem('hub_user_session');
             githubBtn.textContent = 'Sign in with GitHub';
-            githubBtn.style.background = '';
+            githubBtn.style.background = 'rgba(255,255,255,0.08)';
+            githubBtn.style.borderColor = 'var(--border-color)';
             alert('Successfully logged out!');
         } else {
             const username = prompt('Enter your GitHub username to sign in:');
@@ -174,6 +235,8 @@ function initGitHubAuth() {
                 localStorage.setItem('hub_user_session', JSON.stringify(newSession));
                 githubBtn.textContent = `Logged in as ${newSession.username} (Logout)`;
                 githubBtn.style.background = 'var(--accent-success, #2ea043)';
+                githubBtn.style.borderColor = 'var(--accent-success, #2ea043)';
+                githubBtn.style.color = '#fff';
                 alert(`Welcome, ${newSession.username}! You are now signed in.`);
             }
         }
@@ -261,48 +324,4 @@ function loadRecentlyPlayed() {
             </div>
         `;
     }).join('');
-}
-
-// --- Background Particle Canvas Engine ---
-function initCanvas() {
-    const canvas = document.getElementById('bg-canvas');
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-
-    let width = canvas.width = window.innerWidth;
-    let height = canvas.height = window.innerHeight;
-
-    window.addEventListener('resize', () => {
-        width = canvas.width = window.innerWidth;
-        height = canvas.height = window.innerHeight;
-    });
-
-    const particles = Array.from({ length: 40 }, () => ({
-        x: Math.random() * width,
-        y: Math.random() * height,
-        vx: (Math.random() - 0.5) * 0.5,
-        vy: (Math.random() - 0.5) * 0.5,
-        radius: Math.random() * 1.5 + 0.5
-    }));
-
-    function render() {
-        ctx.clearRect(0, 0, width, height);
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.06)';
-
-        particles.forEach(p => {
-            p.x += p.vx;
-            p.y += p.vy;
-            if (p.x < 0) p.x = width;
-            if (p.x > width) p.x = 0;
-            if (p.y < 0) p.y = height;
-            if (p.y > height) p.y = 0;
-
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-            ctx.fill();
-        });
-
-        requestAnimationFrame(render);
-    }
-    render();
 }
