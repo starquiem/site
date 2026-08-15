@@ -1,6 +1,23 @@
-// --- Full script.js for Minimalist Hub ---
+// --- Revamped script.js with Loading Bar & Centered Layout Support ---
 
+// Handle Loading Bar animation and completion
 document.addEventListener('DOMContentLoaded', () => {
+    const loaderBar = document.getElementById('loader-bar');
+    const loaderOverlay = document.getElementById('loader-overlay');
+    
+    let progress = 0;
+    const interval = setInterval(() => {
+        progress += Math.floor(Math.random() * 25) + 15;
+        if (progress >= 100) {
+            progress = 100;
+            clearInterval(interval);
+            setTimeout(() => {
+                if (loaderOverlay) loaderOverlay.classList.add('fade-out');
+            }, 250);
+        }
+        if (loaderBar) loaderBar.style.width = progress + '%';
+    }, 50);
+
     // 1. Load saved settings
     const savedColor = localStorage.getItem('borderColor') || '#4CAF50';
     const savedPos = localStorage.getItem('sidebarPos') || 'sidebar-left';
@@ -62,7 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (localStorage.getItem('gh_logged_in') === 'true') updateLoginUI(true);
 });
 
-// Ensure canvas initializes correctly across all hosting environments (GitHub Pages & local)
+// Ensure canvas initializes correctly across all hosting environments
 window.addEventListener('load', () => {
     const savedBg = localStorage.getItem('bgMode') || 'particles';
     const savedColor = localStorage.getItem('borderColor') || '#4CAF50';
@@ -147,10 +164,9 @@ function updateLoginUI(isLoggedIn) {
     }
 }
 
-// --- Robust Event Delegation (Fixes all click/button issues) ---
+// --- Robust Event Delegation ---
 function setupGlobalEventListeners() {
     document.body.addEventListener('click', (e) => {
-        // Handle Like / Dislike clicks
         const rateBtn = e.target.closest('.rate-btn');
         if (rateBtn) {
             e.preventDefault();
@@ -163,7 +179,6 @@ function setupGlobalEventListeners() {
             return;
         }
 
-        // Handle Favorite clicks
         const favBtn = e.target.closest('.fav-btn');
         if (favBtn) {
             e.preventDefault();
@@ -175,7 +190,6 @@ function setupGlobalEventListeners() {
             return;
         }
 
-        // Handle Fullscreen button
         if (e.target.closest('#fullscreen-btn')) {
             e.preventDefault();
             toggleFullscreen();
@@ -184,7 +198,7 @@ function setupGlobalEventListeners() {
     });
 }
 
-// --- Like / Dislike System Logic ---
+// --- Rating System Logic ---
 function handleRating(gameId, type, containerElement) {
     let ratings = JSON.parse(localStorage.getItem('gameRatings')) || {};
     if (!ratings[gameId]) ratings[gameId] = { likes: 0, dislikes: 0, userVote: null };
@@ -265,7 +279,11 @@ export function sortAndRenderCatalog() {
             header.className = 'section-header';
             header.textContent = letter;
             grid.appendChild(header);
-            letterGroups[letter].forEach(card => grid.appendChild(card));
+            
+            const subGrid = document.createElement('div');
+            subGrid.className = 'grid';
+            letterGroups[letter].forEach(card => subGrid.appendChild(card));
+            grid.appendChild(subGrid);
         }
     });
 
@@ -274,7 +292,11 @@ export function sortAndRenderCatalog() {
         header.className = 'section-header';
         header.textContent = '1-9 / Symbols';
         grid.appendChild(header);
-        symbolGroup.forEach(card => grid.appendChild(card));
+        
+        const subGrid = document.createElement('div');
+        subGrid.className = 'grid';
+        symbolGroup.forEach(card => subGrid.appendChild(card));
+        grid.appendChild(subGrid);
     }
 }
 
@@ -387,7 +409,6 @@ function initBackground(mode, accentColor) {
 
 window.addEventListener('resize', () => initBackground(localStorage.getItem('bgMode') || 'particles', localStorage.getItem('borderColor') || '#4CAF50'));
 
-// Expose necessary functions for settings page file inputs
 window.exportSaveData = exportSaveData;
 window.importSaveData = importSaveData;
 window.loginWithGitHub = loginWithGitHub;
