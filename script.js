@@ -1,12 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // 1. Load saved settings
     const savedColor = localStorage.getItem('borderColor') || '#4CAF50';
     const savedPos = localStorage.getItem('sidebarPos') || 'sidebar-left';
     const savedBg = localStorage.getItem('bgMode') || 'particles';
     const savedVisibility = localStorage.getItem('sidebarVisibility') || 'always';
     const savedTheme = localStorage.getItem('themeMode') || 'dark';
 
+    // Apply settings
     document.documentElement.style.setProperty('--border-color', savedColor);
-    
     if (savedTheme === 'light') {
         document.body.classList.add('light-mode');
     }
@@ -21,6 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     initBackground(savedBg, savedColor);
 
+    // Update settings UI if on settings page
     const colorPicker = document.getElementById('color-picker');
     const posSelect = document.getElementById('pos-select');
     const bgSelect = document.getElementById('bg-select');
@@ -33,15 +35,32 @@ document.addEventListener('DOMContentLoaded', () => {
     if (visSelect) visSelect.value = savedVisibility;
     if (themeSelect) themeSelect.value = savedTheme;
 
+    // Search bar functionality
     const searchBar = document.getElementById('search-bar');
     if (searchBar) {
         searchBar.addEventListener('input', filterCards);
     }
 
+    // --- THIS IS THE FIX FOR THE IFRAME ---
+    // If we are on play.html, grab the game file from the URL and load it into the iframe
+    const urlParams = new URLSearchParams(window.location.search);
+    const gameSrc = urlParams.get('src');
+    const gameFrame = document.getElementById('game-frame');
+    if (gameSrc && gameFrame) {
+        gameFrame.src = gameSrc;
+    }
+    // --------------------------------------
+
     loadFavorites();
     sortAndRenderCatalog();
+    
+    // Check GitHub login status
+    if (localStorage.getItem('gh_logged_in') === 'true') {
+        updateLoginUI(true);
+    }
 });
 
+// --- Settings & UI Functions ---
 export function updateTheme(theme) {
     if (theme === 'light') {
         document.body.classList.add('light-mode');
@@ -82,6 +101,7 @@ export function updateBgMode(mode) {
     initBackground(mode, color);
 }
 
+// --- Catalog Sorting & Filtering ---
 export function sortAndRenderCatalog() {
     const grid = document.getElementById('catalog-grid');
     if (!grid) return;
@@ -156,6 +176,7 @@ function filterCards() {
     });
 }
 
+// --- Fullscreen ---
 export function toggleFullscreen() {
     const wrapper = document.querySelector('.iframe-wrapper') || document.getElementById('game-frame');
     if (!wrapper) return;
@@ -169,6 +190,7 @@ export function toggleFullscreen() {
     }
 }
 
+// --- Favorites ---
 let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
 
 export function toggleFavorite(id, title, imgSrc, buttonElement, event) {
@@ -176,8 +198,14 @@ export function toggleFavorite(id, title, imgSrc, buttonElement, event) {
 
     const index = favorites.findIndex(fav => fav.id === id);
     
+    // Get the link destination from the parent anchor tag if it exists
+    let itemLink = "play.html";
+    if (buttonElement && buttonElement.nextElementSibling && buttonElement.nextElementSibling.tagName === 'A') {
+        itemLink = buttonElement.nextElementSibling.getAttribute('href');
+    }
+    
     if (index === -1) {
-        favorites.push({ id, title, imgSrc });
+        favorites.push({ id, title, imgSrc, link: itemLink });
         buttonElement.classList.add('active');
         buttonElement.innerHTML = '★';
     } else {
@@ -206,10 +234,11 @@ function loadFavorites() {
     }
 
     favorites.forEach(fav => {
+        const linkDest = fav.link || 'play.html';
         grid.innerHTML += `
             <div class="card">
                 <button class="fav-btn active" onclick="window.toggleFavorite('${fav.id}', '${fav.title}', '${fav.imgSrc}', this, event); setTimeout(loadFavorites, 200);">★</button>
-                <a href="play.html" style="text-decoration: none; color: inherit; height: 100%; display: flex; flex-direction: column;">
+                <a href="${linkDest}" style="text-decoration: none; color: inherit; height: 100%; display: flex; flex-direction: column;">
                     <div class="card-title">${fav.title}</div>
                     <div class="card-img-container">
                         <img src="${fav.imgSrc}" alt="${fav.title}">
@@ -220,6 +249,7 @@ function loadFavorites() {
     });
 }
 
+// --- Save Data Management ---
 export function exportSaveData() {
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(localStorage));
     const downloadAnchor = document.createElement('a');
@@ -250,6 +280,7 @@ export function importSaveData(event) {
     reader.readAsText(file);
 }
 
+// --- Login ---
 export function loginWithGitHub() {
     localStorage.setItem('gh_logged_in', 'true');
     updateLoginUI(true);
@@ -266,12 +297,7 @@ function updateLoginUI(isLoggedIn) {
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    if (localStorage.getItem('gh_logged_in') === 'true') {
-        updateLoginUI(true);
-    }
-});
-
+// --- Canvas Backgrounds ---
 let canvasAnimation;
 function initBackground(mode, accentColor) {
     const canvas = document.getElementById('bg-canvas');
@@ -395,6 +421,7 @@ window.addEventListener('resize', () => {
     initBackground(savedBg, savedColor);
 });
 
+// --- EXPOSE FUNCTIONS TO WINDOW FOR ESM HTML INLINE EVENTS ---
 window.updateTheme = updateTheme;
 window.updateBorderColor = updateBorderColor;
 window.updateSidebarPos = updateSidebarPos;
