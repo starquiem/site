@@ -323,3 +323,42 @@ select:hover, button.setting-btn:hover {
     color: #000;
     transform: translateY(-2px);
 }
+/* --- Sorting Section Headers --- */
+.section-header {
+    width: 100%;
+    font-size: 18px;
+    font-weight: 800;
+    margin: 25px 0 15px 0;
+    padding-bottom: 5px;
+    border-bottom: 2px solid var(--border-color);
+    color: var(--border-color);
+}
+
+.section-header:first-of-type {
+    margin-top: 10px;
+}
+
+/* --- Import / Export Button Row --- */
+.data-controls {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.data-btn {
+    flex: 1;
+    background: var(--accent-color);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+.data-btn:hover {
+    background: var(--border-color);
+    color: #000;
+}
