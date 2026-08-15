@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const savedVisibility = localStorage.getItem('sidebarVisibility') || 'always';
     const savedTheme = localStorage.getItem('themeMode') || 'dark';
 
-    // Apply settings
+    // Apply root CSS variables & themes
     document.documentElement.style.setProperty('--border-color', savedColor);
     if (savedTheme === 'light') {
         document.body.classList.add('light-mode');
@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     initBackground(savedBg, savedColor);
 
-    // Update settings UI if on settings page
+    // Sync Settings form values if present
     const colorPicker = document.getElementById('color-picker');
     const posSelect = document.getElementById('pos-select');
     const bgSelect = document.getElementById('bg-select');
@@ -41,26 +41,23 @@ document.addEventListener('DOMContentLoaded', () => {
         searchBar.addEventListener('input', filterCards);
     }
 
-    // --- THIS IS THE FIX FOR THE IFRAME ---
-    // If we are on play.html, grab the game file from the URL and load it into the iframe
+    // Auto-load iframe content on play.html if src parameter is supplied
     const urlParams = new URLSearchParams(window.location.search);
     const gameSrc = urlParams.get('src');
     const gameFrame = document.getElementById('game-frame');
     if (gameSrc && gameFrame) {
-        gameFrame.src = gameSrc;
+        gameFrame.src = decodeURIComponent(gameSrc);
     }
-    // --------------------------------------
 
     loadFavorites();
     sortAndRenderCatalog();
     
-    // Check GitHub login status
     if (localStorage.getItem('gh_logged_in') === 'true') {
         updateLoginUI(true);
     }
 });
 
-// --- Settings & UI Functions ---
+// --- Settings Functions ---
 export function updateTheme(theme) {
     if (theme === 'light') {
         document.body.classList.add('light-mode');
@@ -79,6 +76,7 @@ export function updateBorderColor(color) {
 
 export function updateSidebarPos(pos) {
     const container = document.getElementById('app-container');
+    if (!container) return;
     const isAutohide = container.classList.contains('sidebar-autohide');
     container.className = pos;
     if (isAutohide) container.classList.add('sidebar-autohide');
@@ -87,6 +85,7 @@ export function updateSidebarPos(pos) {
 
 export function updateSidebarVisibility(mode) {
     const container = document.getElementById('app-container');
+    if (!container) return;
     if (mode === 'autohide') {
         container.classList.add('sidebar-autohide');
     } else {
@@ -101,7 +100,7 @@ export function updateBgMode(mode) {
     initBackground(mode, color);
 }
 
-// --- Catalog Sorting & Filtering ---
+// --- Sorting & Filtering ---
 export function sortAndRenderCatalog() {
     const grid = document.getElementById('catalog-grid');
     if (!grid) return;
@@ -116,7 +115,9 @@ export function sortAndRenderCatalog() {
     const symbolGroup = [];
 
     cards.forEach(card => {
-        const title = card.querySelector('.card-title').textContent.trim();
+        const titleElem = card.querySelector('.card-title');
+        if (!titleElem) return;
+        const title = titleElem.textContent.trim();
         const firstChar = title.charAt(0).toUpperCase();
 
         if (firstChar >= 'A' && firstChar <= 'Z') {
@@ -154,7 +155,8 @@ function filterCards() {
     const headers = document.querySelectorAll('.section-header');
 
     cards.forEach(card => {
-        const title = card.querySelector('.card-title').textContent.toLowerCase();
+        const titleElem = card.querySelector('.card-title');
+        const title = titleElem ? titleElem.textContent.toLowerCase() : '';
         if (title.includes(query)) {
             card.style.display = 'flex';
         } else {
@@ -190,15 +192,14 @@ export function toggleFullscreen() {
     }
 }
 
-// --- Favorites ---
+// --- Favorites System ---
 let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
 
 export function toggleFavorite(id, title, imgSrc, buttonElement, event) {
-    if(event) event.preventDefault();
+    if (event) event.preventDefault();
 
     const index = favorites.findIndex(fav => fav.id === id);
     
-    // Get the link destination from the parent anchor tag if it exists
     let itemLink = "play.html";
     if (buttonElement && buttonElement.nextElementSibling && buttonElement.nextElementSibling.tagName === 'A') {
         itemLink = buttonElement.nextElementSibling.getAttribute('href');
@@ -249,7 +250,7 @@ function loadFavorites() {
     });
 }
 
-// --- Save Data Management ---
+// --- Data Export / Import ---
 export function exportSaveData() {
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(localStorage));
     const downloadAnchor = document.createElement('a');
@@ -280,7 +281,7 @@ export function importSaveData(event) {
     reader.readAsText(file);
 }
 
-// --- Login ---
+// --- GitHub Sign In ---
 export function loginWithGitHub() {
     localStorage.setItem('gh_logged_in', 'true');
     updateLoginUI(true);
@@ -297,7 +298,7 @@ function updateLoginUI(isLoggedIn) {
     }
 }
 
-// --- Canvas Backgrounds ---
+// --- Canvas Background Animations ---
 let canvasAnimation;
 function initBackground(mode, accentColor) {
     const canvas = document.getElementById('bg-canvas');
@@ -421,7 +422,7 @@ window.addEventListener('resize', () => {
     initBackground(savedBg, savedColor);
 });
 
-// --- EXPOSE FUNCTIONS TO WINDOW FOR ESM HTML INLINE EVENTS ---
+// --- Window Bindings for Inline Calls ---
 window.updateTheme = updateTheme;
 window.updateBorderColor = updateBorderColor;
 window.updateSidebarPos = updateSidebarPos;
