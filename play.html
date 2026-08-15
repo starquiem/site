@@ -11,17 +11,17 @@
     
     <div id="app-container" class="sidebar-left">
         <nav class="nav-bar">
-            <a href="index.html" class="nav-link">Home</a>
-            <a href="games.html" class="nav-link">Games</a>
-            <a href="shows.html" class="nav-link">Shows</a>
-            <a href="favorites.html" class="nav-link">⭐ Favs</a>
-            <a href="settings.html" class="nav-link">⚙️</a>
+            <a href="index.html" class="nav-link" title="Home" aria-label="Home">🏠</a>
+            <a href="games.html" class="nav-link" title="Games" aria-label="Games">🎮</a>
+            <a href="shows.html" class="nav-link" title="Shows" aria-label="Shows">📺</a>
+            <a href="favorites.html" class="nav-link" title="Favorites" aria-label="Favorites">⭐</a>
+            <a href="settings.html" class="nav-link" title="Settings" aria-label="Settings">⚙️</a>
         </nav>
 
         <main class="content">
             <div class="play-container">
                 <div class="iframe-wrapper">
-                    <iframe id="game-frame" src="about:blank"></iframe>
+                    <iframe id="game-frame" src="about:blank" allow="fullscreen; autoplay; gamepad; clipboard-write"></iframe>
                 </div>
                 <div class="action-bar">
                     <button class="btn-primary" onclick="window.history.back()">← Back</button>
@@ -31,6 +31,21 @@
         </main>
     </div>
 
+    <!-- Direct URL parser ensures iframe loads instantly -->
+    <script>
+        (function() {
+            const params = new URLSearchParams(window.location.search);
+            const gameSrc = params.get('src');
+            if (gameSrc) {
+                window.addEventListener('DOMContentLoaded', () => {
+                    const frame = document.getElementById('game-frame');
+                    if (frame) {
+                        frame.src = decodeURIComponent(gameSrc);
+                    }
+                });
+            }
+        })();
+    </script>
     <script type="module" src="script.js"></script>
 </body>
 </html>
