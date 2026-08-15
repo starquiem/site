@@ -362,3 +362,24 @@ select:hover, button.setting-btn:hover {
     background: var(--border-color);
     color: #000;
 }
+/* --- Light Mode Theme --- */
+body.light-mode {
+    --bg-color: #f4f4f4;
+    --text-color: #222222;
+    --sidebar-bg: #ffffff;
+    --border-color: #2e7d32;
+    --accent-color: #e0e0e0;
+}
+
+body.light-mode .card {
+    background-color: #ffffff;
+}
+
+body.light-mode .search-bar {
+    background: #ffffff;
+    color: #222222;
+}
+
+body.light-mode .setting-group {
+    background: #ffffff;
+}
