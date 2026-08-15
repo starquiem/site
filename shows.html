@@ -3,15 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minimalist Hub - Shows</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📺</text></svg>">
+    <title>Shows - Minimalist Hub</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <canvas id="bg-canvas"></canvas>
-
-<div class="grid" id="catalog-grid">
-    </div>
     
     <div id="app-container" class="sidebar-left">
         <nav class="nav-bar">
@@ -23,39 +19,30 @@
         </nav>
 
         <main class="content">
-            <h2>Shows Collection</h2>
-            
+            <h2>Shows Library</h2>
             <div class="search-container">
-                <input type="text" id="search-bar" class="search-bar" placeholder="Search for a show...">
+                <input type="text" id="search-bar" class="search-bar" placeholder="Search shows...">
             </div>
-
-            <div class="grid">
+            
+            <div class="grid" id="catalog-grid">
                 <div class="card">
-                    <button class="fav-btn" onclick="toggleFavorite('s1', 'Anime Series', 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=300&q=80', this, event)">☆</button>
+                    <button class="fav-btn" onclick="window.toggleFavorite('show1', 'Cyber Tales', 'https://via.placeholder.com/160x200', this, event)">☆</button>
                     <a href="play.html" style="text-decoration: none; color: inherit; height: 100%; display: flex; flex-direction: column;">
-                        <div class="card-title">Anime Series</div>
-                        <div class="card-img-container">
-                            <img src="https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=300&q=80" alt="Anime Series">
-                        </div>
+                        <div class="card-title">Cyber Tales</div>
+                        <div class="card-img-container"><img src="https://via.placeholder.com/160x200" alt="Cyber Tales"></div>
+                    </a>
+                </div>
+                <div class="card">
+                    <button class="fav-btn" onclick="window.toggleFavorite('show2', 'Cosmic Journey', 'https://via.placeholder.com/160x200', this, event)">☆</button>
+                    <a href="play.html" style="text-decoration: none; color: inherit; height: 100%; display: flex; flex-direction: column;">
+                        <div class="card-title">Cosmic Journey</div>
+                        <div class="card-img-container"><img src="https://via.placeholder.com/160x200" alt="Cosmic Journey"></div>
                     </a>
                 </div>
             </div>
         </main>
     </div>
 
-    <script src="script.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const savedFavs = JSON.parse(localStorage.getItem('favorites')) || [];
-            document.querySelectorAll('.fav-btn').forEach(btn => {
-                const funcText = btn.getAttribute('onclick');
-                const idMatch = funcText.match(/'([^']+)'/);
-                if(idMatch && savedFavs.some(f => f.id === idMatch[1])) {
-                    btn.classList.add('active');
-                    btn.innerHTML = '★';
-                }
-            });
-        });
-    </script>
+    <script type="module" src="script.js"></script>
 </body>
 </html>
