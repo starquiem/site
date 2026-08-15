@@ -1,411 +1,266 @@
-document.addEventListener('DOMContentLoaded', () => {
-    highlightActiveNav();
-
+// Initialization and loader animation
+window.addEventListener('DOMContentLoaded', () => {
     const loaderBar = document.getElementById('loader-bar');
     const loaderOverlay = document.getElementById('loader-overlay');
-    
-    let progress = 0;
-    const interval = setInterval(() => {
-        progress += Math.floor(Math.random() * 25) + 15;
-        if (progress >= 100) {
-            progress = 100;
-            clearInterval(interval);
-            setTimeout(() => {
-                if (loaderOverlay) loaderOverlay.classList.add('fade-out');
-            }, 250);
-        }
-        if (loaderBar) loaderBar.style.width = progress + '%';
-    }, 40);
-
-    const savedColor = localStorage.getItem('borderColor') || '#4CAF50';
-    const savedPos = localStorage.getItem('sidebarPos') || 'sidebar-left';
-    const savedBg = localStorage.getItem('bgMode') || 'particles';
-    const savedVisibility = localStorage.getItem('sidebarVisibility') || 'always';
-    const savedTheme = localStorage.getItem('themeMode') || 'dark';
-
-    document.documentElement.style.setProperty('--border-color', savedColor);
-    if (savedTheme === 'light') document.body.classList.add('light-mode');
-
-    const container = document.getElementById('app-container');
-    if (container) {
-        container.className = savedPos;
-        if (savedVisibility === 'autohide') container.classList.add('sidebar-autohide');
+    if (loaderBar && loaderOverlay) {
+        let width = 0;
+        const interval = setInterval(() => {
+            width += 20;
+            loaderBar.style.width = width + '%';
+            if (width >= 100) {
+                clearInterval(interval);
+                loaderOverlay.classList.add('fade-out');
+                setTimeout(() => loaderOverlay.remove(), 400);
+            }
+        }, 50);
     }
+    loadSettings();
+    initCanvas();
+    loadRecentlyPlayed();
+});
 
-    initBackground(savedBg, savedColor);
+// Settings Management
+function loadSettings() {
+    const settings = JSON.parse(localStorage.getItem('hub_settings')) || {
+        accent: '#4CAF50',
+        theme: 'dark',
+        position: 'sidebar-left',
+        visibility: 'always',
+        bgEffect: 'particles'
+    };
+
+    applySettings(settings);
 
     const colorPicker = document.getElementById('color-picker');
-    const posSelect = document.getElementById('pos-select');
-    const bgSelect = document.getElementById('bg-select');
-    const visSelect = document.getElementById('visibility-select');
     const themeSelect = document.getElementById('theme-select');
+    const posSelect = document.getElementById('pos-select');
+    const visibilitySelect = document.getElementById('visibility-select');
+    const bgSelect = document.getElementById('bg-select');
+
+    if (colorPicker) colorPicker.value = settings.accent;
+    if (themeSelect) themeSelect.value = settings.theme;
+    if (posSelect) posSelect.value = settings.position;
+    if (visibilitySelect) visibilitySelect.value = settings.visibility;
+    if (bgSelect) bgSelect.value = settings.bgEffect;
+
+    [colorPicker, themeSelect, posSelect, visibilitySelect, bgSelect].forEach(element => {
+        if (element) {
+            element.addEventListener('change', () => {
+                const updated = {
+                    accent: colorPicker.value,
+                    theme: themeSelect.value,
+                    position: posSelect.value,
+                    visibility: visibilitySelect.value,
+                    bgEffect: bgSelect.value
+                };
+                localStorage.setItem('hub_settings', JSON.stringify(updated));
+                applySettings(updated);
+            });
+        }
+    });
+}
+
+function applySettings(settings) {
+    document.documentElement.style.setProperty('--border-color', settings.accent);
     
-    if (colorPicker) colorPicker.value = savedColor;
-    if (posSelect) posSelect.value = savedPos;
-    if (bgSelect) bgSelect.value = savedBg;
-    if (visSelect) visSelect.value = savedVisibility;
-    if (themeSelect) themeSelect.value = savedTheme;
+    const body = document.body;
+    body.className = '';
+    if (settings.theme === 'light') body.classList.add('light-mode');
+    if (settings.theme === 'hacker') body.classList.add('hacker-mode');
+    if (settings.theme === 'sakura') body.classList.add('sakura-mode');
 
-    if (colorPicker) colorPicker.addEventListener('input', (e) => updateBorderColor(e.target.value));
-    if (posSelect) posSelect.addEventListener('change', (e) => updateSidebarPos(e.target.value));
-    if (bgSelect) bgSelect.addEventListener('change', (e) => updateBgMode(e.target.value));
-    if (visSelect) visSelect.addEventListener('change', (e) => updateSidebarVisibility(e.target.value));
-    if (themeSelect) themeSelect.addEventListener('change', (e) => updateTheme(e.target.value));
-
-    const searchBar = document.getElementById('search-bar');
-    if (searchBar) searchBar.addEventListener('input', filterCards);
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const gameSrc = urlParams.get('src');
-    const gameId = urlParams.get('id') || 'current-game';
-    const gameFrame = document.getElementById('game-frame');
-    if (gameSrc && gameFrame) {
-        gameFrame.src = decodeURIComponent(gameSrc);
-        const playRating = document.getElementById('play-rating');
-        if (playRating) playRating.setAttribute('data-game-id', gameId);
+    const appContainer = document.getElementById('app-container');
+    if (appContainer) {
+        appContainer.className = `${settings.position} ${settings.visibility === 'autohide' ? 'sidebar-autohide' : ''}`;
     }
 
-    loadFavorites();
-    sortAndRenderCatalog();
-    initAllRatings();
-    setupGlobalEventListeners();
-    
-    if (localStorage.getItem('gh_logged_in') === 'true') updateLoginUI(true);
-});
-
-function highlightActiveNav() {
-    const page = window.location.pathname.split("/").pop() || "index.html";
-    if (page.includes("index") || page === "") {
-        document.getElementById('nav-index')?.classList.add('active');
-    } else if (page.includes("favorites")) {
-        document.getElementById('nav-favorites')?.classList.add('active');
-    } else if (page.includes("settings")) {
-        document.getElementById('nav-settings')?.classList.add('active');
+    if (window.updateCanvasMode) {
+        window.updateCanvasMode(settings.bgEffect);
     }
 }
 
-window.addEventListener('load', () => {
-    const savedBg = localStorage.getItem('bgMode') || 'particles';
-    const savedColor = localStorage.getItem('borderColor') || '#4CAF50';
-    initBackground(savedBg, savedColor);
-});
+// Background Canvas Particle Engine (Particles, Sakura, Hacker Rain)
+let canvasAnimationId = null;
+function initCanvas() {
+    const canvas = document.getElementById('bg-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
 
-function updateTheme(theme) {
-    theme === 'light' ? document.body.classList.add('light-mode') : document.body.classList.remove('light-mode');
-    localStorage.setItem('themeMode', theme);
+    let width = canvas.width = window.innerWidth;
+    let height = canvas.height = window.innerHeight;
+
+    window.addEventListener('resize', () => {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+    });
+
+    let currentMode = JSON.parse(localStorage.getItem('hub_settings'))?.bgEffect || 'particles';
+
+    window.updateCanvasMode = (mode) => {
+        currentMode = mode;
+    };
+
+    // Standard Particles
+    let particles = Array.from({ length: 50 }, () => ({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        vx: (Math.random() - 0.5) * 1,
+        vy: (Math.random() - 0.5) * 1,
+        radius: Math.random() * 2 + 1
+    }));
+
+    // Sakura Petals
+    let sakura = Array.from({ length: 40 }, () => ({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        vx: Math.random() * 1.5 + 0.5,
+        vy: Math.random() * 1.5 + 1,
+        size: Math.random() * 6 + 4,
+        angle: Math.random() * 360,
+        spin: Math.random() * 0.05 - 0.025
+    }));
+
+    // Hacker Digital Rain
+    const fontSize = 16;
+    const columns = Math.floor(width / fontSize);
+    let drops = Array.from({ length: columns }, () => Math.floor(Math.random() * height));
+    const chars = '01ABCDEFGHIJKLMNOPQRSTUVWXYZ@#$%&*';
+
+    function render() {
+        ctx.clearRect(0, 0, width, height);
+
+        if (currentMode === 'particles') {
+            ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--border-color') || '#4CAF50';
+            particles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+                if (p.x < 0) p.x = width;
+                if (p.x > width) p.x = 0;
+                if (p.y < 0) p.y = height;
+                if (p.y > height) p.y = 0;
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fill();
+            });
+        } else if (currentMode === 'sakura') {
+            ctx.fillStyle = '#ffb7c5';
+            sakura.forEach(s => {
+                s.x += s.vx + Math.sin(s.angle);
+                s.y += s.vy;
+                s.angle += s.spin;
+                if (s.y > height + 10) {
+                    s.y = -10;
+                    s.x = Math.random() * width;
+                }
+                if (s.x > width + 10) s.x = -10;
+
+                ctx.save();
+                ctx.translate(s.x, s.y);
+                ctx.rotate(s.angle);
+                ctx.beginPath();
+                ctx.ellipse(0, 0, s.size, s.size / 2, 0, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            });
+        } else if (currentMode === 'hacker') {
+            ctx.fillStyle = 'rgba(0, 255, 102, 0.85)';
+            ctx.font = fontSize + 'px monospace';
+            drops.forEach((y, i) => {
+                const text = chars.charAt(Math.floor(Math.random() * chars.length));
+                ctx.fillText(text, i * fontSize, y * fontSize);
+                if (y * fontSize > height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            });
+        }
+
+        canvasAnimationId = requestAnimationFrame(render);
+    }
+
+    render();
 }
 
-function updateBorderColor(color) {
-    document.documentElement.style.setProperty('--border-color', color);
-    localStorage.setItem('borderColor', color);
-    initBackground(localStorage.getItem('bgMode') || 'particles', color);
+// Slideshow Controller
+let slideIndex = 0;
+window.plusSlides = function(n) {
+    showSlides(slideIndex += n);
 }
 
-function updateSidebarPos(pos) {
-    const container = document.getElementById('app-container');
-    if (!container) return;
-    const isAutohide = container.classList.contains('sidebar-autohide');
-    container.className = pos;
-    if (isAutohide) container.classList.add('sidebar-autohide');
-    localStorage.setItem('sidebarPos', pos);
+function showSlides(n) {
+    const slides = document.getElementsByClassName("slide");
+    if (!slides.length) return;
+    if (n >= slides.length) { slideIndex = 0; }
+    if (n < 0) { slideIndex = slides.length - 1; }
+    for (let i = 0; i < slides.length; i++) {
+        slides[i].classList.remove("active");
+    }
+    slides[slideIndex].classList.add("active");
 }
 
-function updateSidebarVisibility(mode) {
-    const container = document.getElementById('app-container');
-    if (!container) return;
-    mode === 'autohide' ? container.classList.add('sidebar-autohide') : container.classList.remove('sidebar-autohide');
-    localStorage.setItem('sidebarVisibility', mode);
+// Auto-advance slideshow every 5 seconds
+setInterval(() => {
+    slideIndex++;
+    showSlides(slideIndex);
+}, 5000);
+
+// Recently Played Tracking & Rendering
+window.trackRecent = function(title, img, src, id) {
+    let recent = JSON.parse(localStorage.getItem('hub_recent')) || [];
+    recent = recent.filter(item => item.id !== id);
+    recent.unshift({ title, img, src, id });
+    if (recent.length > 4) recent.pop();
+    localStorage.setItem('hub_recent', JSON.stringify(recent));
+};
+
+function loadRecentlyPlayed() {
+    const recentGrid = document.getElementById('recent-grid');
+    if (!recentGrid) return;
+    const recent = JSON.parse(localStorage.getItem('hub_recent')) || [];
+    
+    if (recent.length === 0) {
+        recentGrid.innerHTML = `<div style="color: var(--text-muted); font-size: 0.9rem; padding: 10px 0;">No recently played games yet. Jump into one below!</div>`;
+        return;
+    }
+
+    recentGrid.innerHTML = recent.map(game => `
+        <div class="card" data-game-id="${game.id}">
+            <button class="fav-btn" onclick="toggleFavorite(event, '${game.id}')">☆</button>
+            <a href="./play.html?src=${encodeURIComponent(game.src)}&id=${game.id}" onclick="trackRecent('${game.title}', '${game.img}', '${game.src}', '${game.id}')" style="text-decoration: none; color: inherit; display: flex; flex-direction: column; flex: 1;">
+                <div class="card-img-container"><img src="${game.img}" alt="${game.title}"></div>
+                <div class="card-title">${game.title}</div>
+            </a>
+        </div>
+    `).join('');
 }
 
-function updateBgMode(mode) {
-    localStorage.setItem('bgMode', mode);
-    initBackground(mode, localStorage.getItem('borderColor') || '#4CAF50');
-}
+// Data Backup & Restore
+window.exportSaveData = function() {
+    const data = JSON.stringify(localStorage);
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'hub-backup.json';
+    a.click();
+};
 
-export function exportSaveData() {
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(localStorage));
-    const downloadAnchor = document.createElement('a');
-    downloadAnchor.setAttribute("href", dataStr);
-    downloadAnchor.setAttribute("download", "minimalist_hub_backup.json");
-    document.body.appendChild(downloadAnchor);
-    downloadAnchor.click();
-    downloadAnchor.remove();
-}
-
-export function importSaveData(event) {
+window.importSaveData = function(event) {
     const file = event.target.files[0];
     if (!file) return;
     const reader = new FileReader();
     reader.onload = function(e) {
         try {
-            const importedData = JSON.parse(e.target.result);
-            Object.keys(importedData).forEach(key => localStorage.setItem(key, importedData[key]));
-            alert("Save data imported successfully! Reloading page...");
+            const data = JSON.parse(e.target.result);
+            for (const key in data) {
+                localStorage.setItem(key, data[key]);
+            }
+            alert('Save data restored successfully!');
             location.reload();
         } catch (err) {
-            alert("Invalid backup file format.");
+            alert('Invalid backup file.');
         }
     };
     reader.readAsText(file);
-}
-
-export function loginWithGitHub() {
-    localStorage.setItem('gh_logged_in', 'true');
-    updateLoginUI(true);
-}
-
-function updateLoginUI(isLoggedIn) {
-    const btn = document.getElementById('login-btn');
-    if (!btn) return;
-    if (isLoggedIn) {
-        btn.innerHTML = "✅ Signed in with GitHub";
-        btn.style.background = "#2ea44f";
-        btn.style.cursor = "default";
-        btn.onclick = null;
-    }
-}
-
-function setupGlobalEventListeners() {
-    document.body.addEventListener('click', (e) => {
-        const rateBtn = e.target.closest('.rate-btn');
-        if (rateBtn) {
-            e.preventDefault();
-            const actionsContainer = rateBtn.closest('[data-game-id]');
-            if (actionsContainer) {
-                const gameId = actionsContainer.getAttribute('data-game-id');
-                const type = rateBtn.classList.contains('rate-like') ? 'like' : 'dislike';
-                handleRating(gameId, type, actionsContainer);
-            }
-            return;
-        }
-
-        const favBtn = e.target.closest('.fav-btn');
-        if (favBtn) {
-            e.preventDefault();
-            const card = favBtn.closest('.card');
-            const gameId = card.getAttribute('data-game-id') || card.querySelector('a')?.href;
-            const title = card.querySelector('.card-title')?.textContent || 'Item';
-            const imgSrc = card.querySelector('img')?.src || '';
-            toggleFavorite(gameId, title, imgSrc, favBtn);
-            return;
-        }
-
-        if (e.target.closest('#fullscreen-btn')) {
-            e.preventDefault();
-            toggleFullscreen();
-            return;
-        }
-    });
-}
-
-function handleRating(gameId, type, containerElement) {
-    let ratings = JSON.parse(localStorage.getItem('gameRatings')) || {};
-    if (!ratings[gameId]) ratings[gameId] = { likes: 0, dislikes: 0, userVote: null };
-
-    const gameData = ratings[gameId];
-    
-    if (type === 'like') {
-        if (gameData.userVote === 'like') {
-            gameData.likes--; gameData.userVote = null;
-        } else {
-            gameData.likes++;
-            if (gameData.userVote === 'dislike') gameData.dislikes--;
-            gameData.userVote = 'like';
-        }
-    } else if (type === 'dislike') {
-        if (gameData.userVote === 'dislike') {
-            gameData.dislikes--; gameData.userVote = null;
-        } else {
-            gameData.dislikes++;
-            if (gameData.userVote === 'like') gameData.likes--;
-            gameData.userVote = 'dislike';
-        }
-    }
-
-    localStorage.setItem('gameRatings', JSON.stringify(ratings));
-    updateRatingUI(gameId, containerElement);
-}
-
-function updateRatingUI(gameId, containerElement) {
-    if (!containerElement) return;
-    
-    let ratings = JSON.parse(localStorage.getItem('gameRatings')) || {};
-    const data = ratings[gameId] || { likes: 0, dislikes: 0, userVote: null };
-
-    const likeBtn = containerElement.querySelector('.rate-like');
-    const dislikeBtn = containerElement.querySelector('.rate-dislike');
-
-    if (likeBtn && dislikeBtn) {
-        likeBtn.innerHTML = `👍 ${data.likes}`;
-        dislikeBtn.innerHTML = `👎 ${data.dislikes}`;
-        likeBtn.className = `rate-btn rate-like ${data.userVote === 'like' ? 'active-like' : ''}`;
-        dislikeBtn.className = `rate-btn rate-dislike ${data.userVote === 'dislike' ? 'active-dislike' : ''}`;
-    }
-}
-
-function initAllRatings() {
-    document.querySelectorAll('[data-game-id]').forEach(container => {
-        const gameId = container.getAttribute('data-game-id');
-        if (gameId) updateRatingUI(gameId, container);
-    });
-}
-
-export function sortAndRenderCatalog() {
-    const grid = document.getElementById('catalog-grid');
-    if (!grid) return;
-
-    const cards = Array.from(grid.querySelectorAll('.card'));
-    if (cards.length === 0) return;
-
-    const letterGroups = {};
-    for (let i = 65; i <= 90; i++) letterGroups[String.fromCharCode(i)] = [];
-    const symbolGroup = [];
-
-    cards.forEach(card => {
-        const titleElem = card.querySelector('.card-title');
-        if (!titleElem) return;
-        const firstChar = titleElem.textContent.trim().charAt(0).toUpperCase();
-        if (firstChar >= 'A' && firstChar <= 'Z') letterGroups[firstChar].push(card);
-        else symbolGroup.push(card);
-    });
-
-    grid.innerHTML = '';
-
-    Object.keys(letterGroups).forEach(letter => {
-        if (letterGroups[letter].length > 0) {
-            const header = document.createElement('div');
-            header.className = 'section-header';
-            header.textContent = letter;
-            grid.appendChild(header);
-            
-            const subGrid = document.createElement('div');
-            subGrid.className = 'grid';
-            letterGroups[letter].forEach(card => subGrid.appendChild(card));
-            grid.appendChild(subGrid);
-        }
-    });
-
-    if (symbolGroup.length > 0) {
-        const header = document.createElement('div');
-        header.className = 'section-header';
-        header.textContent = '1-9 / Symbols';
-        grid.appendChild(header);
-        
-        const subGrid = document.createElement('div');
-        subGrid.className = 'grid';
-        symbolGroup.forEach(card => subGrid.appendChild(card));
-        grid.appendChild(subGrid);
-    }
-}
-
-function filterCards() {
-    const query = document.getElementById('search-bar').value.toLowerCase();
-    const cards = document.querySelectorAll('.card');
-    const headers = document.querySelectorAll('.section-header');
-
-    cards.forEach(card => {
-        const titleElem = card.querySelector('.card-title');
-        const title = titleElem ? titleElem.textContent.toLowerCase() : '';
-        card.style.display = title.includes(query) ? 'flex' : 'none';
-    });
-
-    headers.forEach(header => {
-        let nextElem = header.nextElementSibling;
-        let hasVisibleCard = false;
-        while (nextElem && !nextElem.classList.contains('section-header')) {
-            if (nextElem.style.display !== 'none') {
-                hasVisibleCard = true; break;
-            }
-            nextElem = nextElem.nextElementSibling;
-        }
-        header.style.display = hasVisibleCard ? 'block' : 'none';
-    });
-}
-
-let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
-
-function toggleFavorite(id, title, imgSrc, buttonElement) {
-    const index = favorites.findIndex(fav => fav.id === id);
-    let itemLink = buttonElement.closest('.card')?.querySelector('a')?.href || "play.html";
-    
-    if (index === -1) {
-        favorites.push({ id, title, imgSrc, link: itemLink });
-        buttonElement.classList.add('active');
-        buttonElement.innerHTML = '★';
-    } else {
-        favorites.splice(index, 1);
-        buttonElement.classList.remove('active');
-        buttonElement.innerHTML = '☆';
-    }
-    localStorage.setItem('favorites', JSON.stringify(favorites));
-    loadFavorites();
-}
-
-function loadFavorites() {
-    const grid = document.getElementById('favorites-grid');
-    if (!grid) return;
-    grid.innerHTML = '';
-    
-    if (favorites.length === 0) {
-        grid.innerHTML = `<div style="width: 100%; text-align: center; padding: 40px; color: #888;">
-            <h3>You don't have any favorites yet!</h3></div>`;
-        return;
-    }
-
-    favorites.forEach(fav => {
-        grid.innerHTML += `
-            <div class="card" data-game-id="${fav.id}">
-                <button class="fav-btn active">★</button>
-                <a href="${fav.link}" style="text-decoration: none; color: inherit; display: flex; flex-direction: column; flex: 1;">
-                    <div class="card-img-container"><img src="${fav.imgSrc}" alt="${fav.title}"></div>
-                    <div class="card-title">${fav.title}</div>
-                </a>
-            </div>`;
-    });
-}
-
-function toggleFullscreen() {
-    const wrapper = document.querySelector('.iframe-wrapper') || document.getElementById('game-frame');
-    if (!wrapper) return;
-    !document.fullscreenElement ? wrapper.requestFullscreen() : document.exitFullscreen();
-}
-
-let canvasAnimation;
-function initBackground(mode, accentColor) {
-    const canvas = document.getElementById('bg-canvas');
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-
-    window.cancelAnimationFrame(canvasAnimation);
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-
-    if (mode === 'none') {
-        ctx.clearRect(0, 0, canvas.width, canvas.height); return;
-    }
-
-    if (mode === 'particles') {
-        const particles = Array.from({ length: 50 }, () => ({
-            x: Math.random() * canvas.width, y: Math.random() * canvas.height,
-            vx: (Math.random() - 0.5) * 1.5, vy: (Math.random() - 0.5) * 1.5, size: Math.random() * 3 + 1
-        }));
-        function drawP() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = accentColor;
-            particles.forEach(p => {
-                p.x += p.vx; p.y += p.vy;
-                if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
-                if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
-                ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill();
-            });
-            canvasAnimation = requestAnimationFrame(drawP);
-        }
-        drawP();
-    }
-}
-
-window.addEventListener('resize', () => initBackground(localStorage.getItem('bgMode') || 'particles', localStorage.getItem('borderColor') || '#4CAF50'));
-
-window.exportSaveData = exportSaveData;
-window.importSaveData = importSaveData;
-window.loginWithGitHub = loginWithGitHub;
+};
