@@ -7,7 +7,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.documentElement.style.setProperty('--border-color', savedColor);
     
-    // Apply Theme
     if (savedTheme === 'light') {
         document.body.classList.add('light-mode');
     }
@@ -22,7 +21,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     initBackground(savedBg, savedColor);
 
-    // Sync input elements if on Settings page
     const colorPicker = document.getElementById('color-picker');
     const posSelect = document.getElementById('pos-select');
     const bgSelect = document.getElementById('bg-select');
@@ -44,7 +42,6 @@ document.addEventListener('DOMContentLoaded', () => {
     sortAndRenderCatalog();
 });
 
-// --- SETTINGS LOGIC ---
 export function updateTheme(theme) {
     if (theme === 'light') {
         document.body.classList.add('light-mode');
@@ -85,7 +82,6 @@ export function updateBgMode(mode) {
     initBackground(mode, color);
 }
 
-// --- ALPHABETICAL SORTING ---
 export function sortAndRenderCatalog() {
     const grid = document.getElementById('catalog-grid');
     if (!grid) return;
@@ -132,7 +128,6 @@ export function sortAndRenderCatalog() {
     }
 }
 
-// --- SEARCH LOGIC ---
 function filterCards() {
     const query = document.getElementById('search-bar').value.toLowerCase();
     const cards = document.querySelectorAll('.card');
@@ -161,7 +156,6 @@ function filterCards() {
     });
 }
 
-// --- FULLSCREEN ---
 export function toggleFullscreen() {
     const gameFrame = document.getElementById('game-frame');
     if (!gameFrame) return;
@@ -175,7 +169,6 @@ export function toggleFullscreen() {
     }
 }
 
-// --- FAVORITES ---
 let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
 
 export function toggleFavorite(id, title, imgSrc, buttonElement, event) {
@@ -227,7 +220,6 @@ function loadFavorites() {
     });
 }
 
-// --- BACKUP DATA ---
 export function exportSaveData() {
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(localStorage));
     const downloadAnchor = document.createElement('a');
@@ -258,7 +250,6 @@ export function importSaveData(event) {
     reader.readAsText(file);
 }
 
-// --- GITHUB LOGIN ---
 export function loginWithGitHub() {
     localStorage.setItem('gh_logged_in', 'true');
     updateLoginUI(true);
@@ -281,7 +272,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// --- ADVANCED CANVAS BACKGROUND EFFECTS ---
 let canvasAnimation;
 function initBackground(mode, accentColor) {
     const canvas = document.getElementById('bg-canvas');
@@ -297,7 +287,6 @@ function initBackground(mode, accentColor) {
         return;
     }
 
-    // 1. Floating Particles
     if (mode === 'particles') {
         const particles = Array.from({ length: 50 }, () => ({
             x: Math.random() * canvas.width,
@@ -322,9 +311,7 @@ function initBackground(mode, accentColor) {
             canvasAnimation = requestAnimationFrame(draw);
         }
         draw();
-    } 
-    // 2. Matrix Rain
-    else if (mode === 'matrix') {
+    } else if (mode === 'matrix') {
         const chars = '0123456789ABCDEF';
         const fontSize = 14;
         const columns = canvas.width / fontSize;
@@ -347,9 +334,7 @@ function initBackground(mode, accentColor) {
             canvasAnimation = requestAnimationFrame(draw);
         }
         draw();
-    }
-    // 3. Snowfall Effect
-    else if (mode === 'snow') {
+    } else if (mode === 'snow') {
         const snowflakes = Array.from({ length: 70 }, () => ({
             x: Math.random() * canvas.width,
             y: Math.random() * canvas.height,
@@ -370,9 +355,7 @@ function initBackground(mode, accentColor) {
             canvasAnimation = requestAnimationFrame(draw);
         }
         draw();
-    }
-    // 4. Fireflies Effect
-    else if (mode === 'fireflies') {
+    } else if (mode === 'fireflies') {
         const fireflies = Array.from({ length: 30 }, () => ({
             x: Math.random() * canvas.width,
             y: Math.random() * canvas.height,
