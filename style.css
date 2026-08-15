@@ -8,6 +8,28 @@
     --accent-color: #2a2a2a;
 }
 
+/* Light Mode Theme */
+body.light-mode {
+    --bg-color: #f4f4f4;
+    --text-color: #222222;
+    --sidebar-bg: #ffffff;
+    --border-color: #2e7d32;
+    --accent-color: #e0e0e0;
+}
+
+body.light-mode .card {
+    background-color: #ffffff;
+}
+
+body.light-mode .search-bar {
+    background: #ffffff;
+    color: #222222;
+}
+
+body.light-mode .setting-group {
+    background: #ffffff;
+}
+
 * {
     box-sizing: border-box;
     margin: 0;
@@ -22,7 +44,6 @@ body {
     overflow: hidden;
 }
 
-/* Background Canvas */
 #bg-canvas {
     position: fixed;
     top: 0;
@@ -33,7 +54,6 @@ body {
     pointer-events: none;
 }
 
-/* App Container Layout Modes */
 #app-container {
     display: flex;
     width: 100%;
@@ -44,7 +64,6 @@ body {
 #app-container.sidebar-right { flex-direction: row-reverse; }
 #app-container.sidebar-bottom { flex-direction: column-reverse; }
 
-/* Navigation Styling & Initial Slide-in Animations */
 @keyframes slideInLeft { from { opacity: 0; transform: translateX(-40px); } to { opacity: 1; transform: translateX(0); } }
 @keyframes slideInRight { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
 @keyframes slideInBottom { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
@@ -55,7 +74,7 @@ body {
     padding: 15px;
     border: var(--border-color) solid 2px;
     z-index: 10;
-    transition: opacity 0.4s ease, transform 0.4s ease; /* For the auto-hide fade */
+    transition: opacity 0.4s ease, transform 0.4s ease;
 }
 
 #app-container.sidebar-left .nav-bar {
@@ -82,9 +101,8 @@ body {
     animation: slideInBottom 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 
-/* Auto-Hide Fade-in Logic */
 #app-container.sidebar-autohide .nav-bar {
-    opacity: 0.05; /* Barely visible so you know where to hover */
+    opacity: 0.05;
 }
 #app-container.sidebar-autohide .nav-bar:hover {
     opacity: 1;
@@ -117,7 +135,6 @@ body {
 
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-/* Search Bar */
 .search-container {
     margin-top: 15px;
     margin-bottom: 20px;
@@ -140,7 +157,20 @@ body {
     box-shadow: 0 0 8px var(--border-color);
 }
 
-/* Cards & Cool Hover Animations */
+.section-header {
+    width: 100%;
+    font-size: 18px;
+    font-weight: 800;
+    margin: 25px 0 15px 0;
+    padding-bottom: 5px;
+    border-bottom: 2px solid var(--border-color);
+    color: var(--border-color);
+}
+
+.section-header:first-of-type {
+    margin-top: 10px;
+}
+
 .grid {
     display: flex;
     flex-wrap: wrap;
@@ -157,13 +187,12 @@ body {
     overflow: hidden;
     background-color: var(--sidebar-bg);
     position: relative;
-    /* Smooth, bouncy animation for hover */
     transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
 }
 
 .card:hover {
-    transform: translateY(-10px) scale(1.05); /* Lifts and slightly enlarges */
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.8), 0 0 15px var(--border-color); /* Glowing shadow */
+    transform: translateY(-10px) scale(1.05);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.8), 0 0 15px var(--border-color);
 }
 
 .card-title {
@@ -196,10 +225,9 @@ body {
 }
 
 .card:hover .card-img-container img {
-    transform: scale(1.15); /* Zooms image inside the card */
+    transform: scale(1.15);
 }
 
-/* Favorite Button */
 .fav-btn {
     position: absolute;
     top: 40px;
@@ -229,7 +257,6 @@ body {
     color: gold;
 }
 
-/* Settings Forms */
 .setting-group {
     margin-bottom: 20px;
     padding: 15px;
@@ -254,6 +281,30 @@ select:hover, button.setting-btn:hover {
     border-color: #fff;
 }
 
+.data-controls {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.data-btn {
+    flex: 1;
+    background: var(--accent-color);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+.data-btn:hover {
+    background: var(--border-color);
+    color: #000;
+}
+
 .github-btn {
     background: #24292e;
     color: white;
@@ -273,7 +324,6 @@ select:hover, button.setting-btn:hover {
 
 .github-btn:hover { background: #2f363d; }
 
-/* Play Page Styling */
 .play-container {
     display: flex;
     flex-direction: column;
@@ -322,64 +372,4 @@ select:hover, button.setting-btn:hover {
     background: var(--border-color);
     color: #000;
     transform: translateY(-2px);
-}
-/* --- Sorting Section Headers --- */
-.section-header {
-    width: 100%;
-    font-size: 18px;
-    font-weight: 800;
-    margin: 25px 0 15px 0;
-    padding-bottom: 5px;
-    border-bottom: 2px solid var(--border-color);
-    color: var(--border-color);
-}
-
-.section-header:first-of-type {
-    margin-top: 10px;
-}
-
-/* --- Import / Export Button Row --- */
-.data-controls {
-    display: flex;
-    gap: 10px;
-    margin-top: 15px;
-}
-
-.data-btn {
-    flex: 1;
-    background: var(--accent-color);
-    color: var(--text-color);
-    border: 1px solid var(--border-color);
-    padding: 8px 12px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 13px;
-    font-weight: bold;
-    transition: 0.2s;
-}
-
-.data-btn:hover {
-    background: var(--border-color);
-    color: #000;
-}
-/* --- Light Mode Theme --- */
-body.light-mode {
-    --bg-color: #f4f4f4;
-    --text-color: #222222;
-    --sidebar-bg: #ffffff;
-    --border-color: #2e7d32;
-    --accent-color: #e0e0e0;
-}
-
-body.light-mode .card {
-    background-color: #ffffff;
-}
-
-body.light-mode .search-bar {
-    background: #ffffff;
-    color: #222222;
-}
-
-body.light-mode .setting-group {
-    background: #ffffff;
 }
