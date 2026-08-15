@@ -1,7 +1,6 @@
-// --- Revamped script.js with Loading Bar & Centered Layout Support ---
-
-// Handle Loading Bar animation and completion
 document.addEventListener('DOMContentLoaded', () => {
+    highlightActiveNav();
+
     const loaderBar = document.getElementById('loader-bar');
     const loaderOverlay = document.getElementById('loader-overlay');
     
@@ -16,9 +15,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 250);
         }
         if (loaderBar) loaderBar.style.width = progress + '%';
-    }, 50);
+    }, 40);
 
-    // 1. Load saved settings
     const savedColor = localStorage.getItem('borderColor') || '#4CAF50';
     const savedPos = localStorage.getItem('sidebarPos') || 'sidebar-left';
     const savedBg = localStorage.getItem('bgMode') || 'particles';
@@ -36,7 +34,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     initBackground(savedBg, savedColor);
 
-    // Sync Settings form values
     const colorPicker = document.getElementById('color-picker');
     const posSelect = document.getElementById('pos-select');
     const bgSelect = document.getElementById('bg-select');
@@ -49,18 +46,15 @@ document.addEventListener('DOMContentLoaded', () => {
     if (visSelect) visSelect.value = savedVisibility;
     if (themeSelect) themeSelect.value = savedTheme;
 
-    // Event listeners for settings changes
     if (colorPicker) colorPicker.addEventListener('input', (e) => updateBorderColor(e.target.value));
     if (posSelect) posSelect.addEventListener('change', (e) => updateSidebarPos(e.target.value));
     if (bgSelect) bgSelect.addEventListener('change', (e) => updateBgMode(e.target.value));
     if (visSelect) visSelect.addEventListener('change', (e) => updateSidebarVisibility(e.target.value));
     if (themeSelect) themeSelect.addEventListener('change', (e) => updateTheme(e.target.value));
 
-    // Search bar functionality
     const searchBar = document.getElementById('search-bar');
     if (searchBar) searchBar.addEventListener('input', filterCards);
 
-    // Auto-load iframe content on play.html if src parameter is supplied
     const urlParams = new URLSearchParams(window.location.search);
     const gameSrc = urlParams.get('src');
     const gameId = urlParams.get('id') || 'current-game';
@@ -79,14 +73,23 @@ document.addEventListener('DOMContentLoaded', () => {
     if (localStorage.getItem('gh_logged_in') === 'true') updateLoginUI(true);
 });
 
-// Ensure canvas initializes correctly across all hosting environments
+function highlightActiveNav() {
+    const page = window.location.pathname.split("/").pop() || "index.html";
+    if (page.includes("index") || page === "") {
+        document.getElementById('nav-index')?.classList.add('active');
+    } else if (page.includes("favorites")) {
+        document.getElementById('nav-favorites')?.classList.add('active');
+    } else if (page.includes("settings")) {
+        document.getElementById('nav-settings')?.classList.add('active');
+    }
+}
+
 window.addEventListener('load', () => {
     const savedBg = localStorage.getItem('bgMode') || 'particles';
     const savedColor = localStorage.getItem('borderColor') || '#4CAF50';
     initBackground(savedBg, savedColor);
 });
 
-// --- Settings Functions ---
 function updateTheme(theme) {
     theme === 'light' ? document.body.classList.add('light-mode') : document.body.classList.remove('light-mode');
     localStorage.setItem('themeMode', theme);
@@ -119,7 +122,6 @@ function updateBgMode(mode) {
     initBackground(mode, localStorage.getItem('borderColor') || '#4CAF50');
 }
 
-// --- Data Export / Import ---
 export function exportSaveData() {
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(localStorage));
     const downloadAnchor = document.createElement('a');
@@ -147,7 +149,6 @@ export function importSaveData(event) {
     reader.readAsText(file);
 }
 
-// --- GitHub Sign In ---
 export function loginWithGitHub() {
     localStorage.setItem('gh_logged_in', 'true');
     updateLoginUI(true);
@@ -164,7 +165,6 @@ function updateLoginUI(isLoggedIn) {
     }
 }
 
-// --- Robust Event Delegation ---
 function setupGlobalEventListeners() {
     document.body.addEventListener('click', (e) => {
         const rateBtn = e.target.closest('.rate-btn');
@@ -198,7 +198,6 @@ function setupGlobalEventListeners() {
     });
 }
 
-// --- Rating System Logic ---
 function handleRating(gameId, type, containerElement) {
     let ratings = JSON.parse(localStorage.getItem('gameRatings')) || {};
     if (!ratings[gameId]) ratings[gameId] = { likes: 0, dislikes: 0, userVote: null };
@@ -251,7 +250,6 @@ function initAllRatings() {
     });
 }
 
-// --- Sorting, Filtering & Favorites ---
 export function sortAndRenderCatalog() {
     const grid = document.getElementById('catalog-grid');
     if (!grid) return;
@@ -372,7 +370,6 @@ function toggleFullscreen() {
     !document.fullscreenElement ? wrapper.requestFullscreen() : document.exitFullscreen();
 }
 
-// --- Canvas Background Animations ---
 let canvasAnimation;
 function initBackground(mode, accentColor) {
     const canvas = document.getElementById('bg-canvas');
