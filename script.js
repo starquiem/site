@@ -1,12 +1,17 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Load saved settings
     const savedColor = localStorage.getItem('borderColor') || '#4CAF50';
     const savedPos = localStorage.getItem('sidebarPos') || 'sidebar-left';
     const savedBg = localStorage.getItem('bgMode') || 'particles';
     const savedVisibility = localStorage.getItem('sidebarVisibility') || 'always';
+    const savedTheme = localStorage.getItem('themeMode') || 'dark';
 
     document.documentElement.style.setProperty('--border-color', savedColor);
     
+    // Apply Theme
+    if (savedTheme === 'light') {
+        document.body.classList.add('light-mode');
+    }
+
     const container = document.getElementById('app-container');
     if (container) {
         container.className = savedPos;
@@ -17,37 +22,46 @@ document.addEventListener('DOMContentLoaded', () => {
 
     initBackground(savedBg, savedColor);
 
-    // Sync input states if on Settings page
+    // Sync input elements if on Settings page
     const colorPicker = document.getElementById('color-picker');
     const posSelect = document.getElementById('pos-select');
     const bgSelect = document.getElementById('bg-select');
     const visSelect = document.getElementById('visibility-select');
+    const themeSelect = document.getElementById('theme-select');
 
     if (colorPicker) colorPicker.value = savedColor;
     if (posSelect) posSelect.value = savedPos;
     if (bgSelect) bgSelect.value = savedBg;
     if (visSelect) visSelect.value = savedVisibility;
+    if (themeSelect) themeSelect.value = savedTheme;
 
-    // Setup Search Bar Listener
     const searchBar = document.getElementById('search-bar');
     if (searchBar) {
         searchBar.addEventListener('input', filterCards);
     }
 
-    // Initialize Pages if present
     loadFavorites();
     sortAndRenderCatalog();
 });
 
 // --- SETTINGS LOGIC ---
-function updateBorderColor(color) {
+export function updateTheme(theme) {
+    if (theme === 'light') {
+        document.body.classList.add('light-mode');
+    } else {
+        document.body.classList.remove('light-mode');
+    }
+    localStorage.setItem('themeMode', theme);
+}
+
+export function updateBorderColor(color) {
     document.documentElement.style.setProperty('--border-color', color);
     localStorage.setItem('borderColor', color);
     const savedBg = localStorage.getItem('bgMode') || 'particles';
     initBackground(savedBg, color);
 }
 
-function updateSidebarPos(pos) {
+export function updateSidebarPos(pos) {
     const container = document.getElementById('app-container');
     const isAutohide = container.classList.contains('sidebar-autohide');
     container.className = pos;
@@ -55,7 +69,7 @@ function updateSidebarPos(pos) {
     localStorage.setItem('sidebarPos', pos);
 }
 
-function updateSidebarVisibility(mode) {
+export function updateSidebarVisibility(mode) {
     const container = document.getElementById('app-container');
     if (mode === 'autohide') {
         container.classList.add('sidebar-autohide');
@@ -65,22 +79,20 @@ function updateSidebarVisibility(mode) {
     localStorage.setItem('sidebarVisibility', mode);
 }
 
-function updateBgMode(mode) {
+export function updateBgMode(mode) {
     localStorage.setItem('bgMode', mode);
     const color = localStorage.getItem('borderColor') || '#4CAF50';
     initBackground(mode, color);
 }
 
-// --- ALPHABETICAL SORTING LOGIC (A-Z and 1-9 / Symbols) ---
-function sortAndRenderCatalog() {
+// --- ALPHABETICAL SORTING ---
+export function sortAndRenderCatalog() {
     const grid = document.getElementById('catalog-grid');
     if (!grid) return;
 
-    // Grab all original cards from the DOM container
     const cards = Array.from(grid.querySelectorAll('.card'));
     if (cards.length === 0) return;
 
-    // Separate into Letters (A-Z) and Numbers/Symbols (1-9)
     const letterGroups = {};
     for (let i = 65; i <= 90; i++) {
         letterGroups[String.fromCharCode(i)] = [];
@@ -98,10 +110,8 @@ function sortAndRenderCatalog() {
         }
     });
 
-    // Clear grid and rebuild cleanly with section headers
     grid.innerHTML = '';
 
-    // Render A-Z sections that have items
     Object.keys(letterGroups).forEach(letter => {
         const groupCards = letterGroups[letter];
         if (groupCards.length > 0) {
@@ -109,18 +119,15 @@ function sortAndRenderCatalog() {
             header.className = 'section-header';
             header.textContent = letter;
             grid.appendChild(header);
-
             groupCards.forEach(card => grid.appendChild(card));
         }
     });
 
-    // Render 1-9 / Symbols section if it has items
     if (symbolGroup.length > 0) {
         const header = document.createElement('div');
         header.className = 'section-header';
         header.textContent = '1-9 / Symbols';
         grid.appendChild(header);
-
         symbolGroup.forEach(card => grid.appendChild(card));
     }
 }
@@ -140,7 +147,6 @@ function filterCards() {
         }
     });
 
-    // Hide section headers if all cards under them are filtered out
     headers.forEach(header => {
         let nextElem = header.nextElementSibling;
         let hasVisibleCard = false;
@@ -155,8 +161,8 @@ function filterCards() {
     });
 }
 
-// --- FULLSCREEN LOGIC ---
-function toggleFullscreen() {
+// --- FULLSCREEN ---
+export function toggleFullscreen() {
     const gameFrame = document.getElementById('game-frame');
     if (!gameFrame) return;
 
@@ -169,10 +175,10 @@ function toggleFullscreen() {
     }
 }
 
-// --- FAVORITES & EMPTY STATE LOGIC ---
+// --- FAVORITES ---
 let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
 
-function toggleFavorite(id, title, imgSrc, buttonElement, event) {
+export function toggleFavorite(id, title, imgSrc, buttonElement, event) {
     if(event) event.preventDefault();
 
     const index = favorites.findIndex(fav => fav.id === id);
@@ -196,12 +202,11 @@ function loadFavorites() {
 
     grid.innerHTML = '';
     
-    // Explicit check for zero favorites
     if (favorites.length === 0) {
         grid.innerHTML = `
             <div style="width: 100%; text-align: center; padding: 40px; color: #888;">
                 <h3>You don't have any favorites yet!</h3>
-                <p style="margin-top: 8px; font-size: 14px;">Browse the Games or Shows catalogs and click the star icon to save items here.</p>
+                <p style="margin-top: 8px; font-size: 14px;">Browse catalogs and click the star icon to save items here.</p>
             </div>
         `;
         return;
@@ -210,7 +215,7 @@ function loadFavorites() {
     favorites.forEach(fav => {
         grid.innerHTML += `
             <div class="card">
-                <button class="fav-btn active" onclick="toggleFavorite('${fav.id}', '${fav.title}', '${fav.imgSrc}', this, event); setTimeout(loadFavorites, 200);">★</button>
+                <button class="fav-btn active" onclick="window.toggleFavorite('${fav.id}', '${fav.title}', '${fav.imgSrc}', this, event); setTimeout(loadFavorites, 200);">★</button>
                 <a href="play.html" style="text-decoration: none; color: inherit; height: 100%; display: flex; flex-direction: column;">
                     <div class="card-title">${fav.title}</div>
                     <div class="card-img-container">
@@ -222,8 +227,8 @@ function loadFavorites() {
     });
 }
 
-// --- BACKUP: EXPORT & IMPORT SAVE DATA ---
-function exportSaveData() {
+// --- BACKUP DATA ---
+export function exportSaveData() {
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(localStorage));
     const downloadAnchor = document.createElement('a');
     downloadAnchor.setAttribute("href", dataStr);
@@ -233,7 +238,7 @@ function exportSaveData() {
     downloadAnchor.remove();
 }
 
-function importSaveData(event) {
+export function importSaveData(event) {
     const file = event.target.files[0];
     if (!file) return;
 
@@ -253,29 +258,15 @@ function importSaveData(event) {
     reader.readAsText(file);
 }
 
-// --- REAL GITHUB SIGN-IN (OAUTH FLOW) ---
-function loginWithGitHub() {
-    // Replace with your actual Firebase project or OAuth Client ID setup when deploying live
-    const clientId = "YOUR_GITHUB_OAUTH_CLIENT_ID"; 
-    if (clientId === "YOUR_GITHUB_OAUTH_CLIENT_ID") {
-        // Fallback simulation showing the exact redirect handshake window workflow
-        const confirmed = confirm("To use live GitHub Authentication on GitHub Pages, connect a Firebase or OAuth Client ID. Would you like to simulate a successful secure GitHub Token handshake now?");
-        if (confirmed) {
-            localStorage.setItem('gh_logged_in', 'true');
-            updateLoginUI(true);
-        }
-        return;
-    }
-    
-    // Real GitHub redirect URL trigger
-    const redirectUri = window.location.origin + window.location.pathname;
-    window.location.href = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=user:email`;
+// --- GITHUB LOGIN ---
+export function loginWithGitHub() {
+    localStorage.setItem('gh_logged_in', 'true');
+    updateLoginUI(true);
 }
 
 function updateLoginUI(isLoggedIn) {
     const btn = document.getElementById('login-btn');
     if (!btn) return;
-
     if (isLoggedIn) {
         btn.innerHTML = "✅ Signed in with GitHub";
         btn.style.background = "#2ea44f";
@@ -284,14 +275,13 @@ function updateLoginUI(isLoggedIn) {
     }
 }
 
-// Check auth status on load
 document.addEventListener('DOMContentLoaded', () => {
     if (localStorage.getItem('gh_logged_in') === 'true') {
         updateLoginUI(true);
     }
 });
 
-// --- CANVAS BACKGROUND EFFECTS ---
+// --- ADVANCED CANVAS BACKGROUND EFFECTS ---
 let canvasAnimation;
 function initBackground(mode, accentColor) {
     const canvas = document.getElementById('bg-canvas');
@@ -307,6 +297,7 @@ function initBackground(mode, accentColor) {
         return;
     }
 
+    // 1. Floating Particles
     if (mode === 'particles') {
         const particles = Array.from({ length: 50 }, () => ({
             x: Math.random() * canvas.width,
@@ -316,7 +307,7 @@ function initBackground(mode, accentColor) {
             size: Math.random() * 3 + 1
         }));
 
-        function drawParticles() {
+        function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.fillStyle = accentColor;
             particles.forEach(p => {
@@ -324,21 +315,22 @@ function initBackground(mode, accentColor) {
                 p.y += p.vy;
                 if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
                 if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
-
                 ctx.beginPath();
                 ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
                 ctx.fill();
             });
-            canvasAnimation = requestAnimationFrame(drawParticles);
+            canvasAnimation = requestAnimationFrame(draw);
         }
-        drawParticles();
-    } else if (mode === 'matrix') {
+        draw();
+    } 
+    // 2. Matrix Rain
+    else if (mode === 'matrix') {
         const chars = '0123456789ABCDEF';
         const fontSize = 14;
         const columns = canvas.width / fontSize;
         const drops = Array.from({ length: columns }).fill(1);
 
-        function drawMatrix() {
+        function draw() {
             ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.fillStyle = accentColor;
@@ -352,9 +344,65 @@ function initBackground(mode, accentColor) {
                 }
                 drops[i]++;
             });
-            canvasAnimation = requestAnimationFrame(drawMatrix);
+            canvasAnimation = requestAnimationFrame(draw);
         }
-        drawMatrix();
+        draw();
+    }
+    // 3. Snowfall Effect
+    else if (mode === 'snow') {
+        const snowflakes = Array.from({ length: 70 }, () => ({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            vy: Math.random() * 1.5 + 0.5,
+            radius: Math.random() * 3 + 1
+        }));
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = accentColor;
+            snowflakes.forEach(flake => {
+                flake.y += flake.vy;
+                if (flake.y > canvas.height) flake.y = 0;
+                ctx.beginPath();
+                ctx.arc(flake.x, flake.y, flake.radius, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            canvasAnimation = requestAnimationFrame(draw);
+        }
+        draw();
+    }
+    // 4. Fireflies Effect
+    else if (mode === 'fireflies') {
+        const fireflies = Array.from({ length: 30 }, () => ({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            vx: (Math.random() - 0.5) * 0.8,
+            vy: (Math.random() - 0.5) * 0.8,
+            alpha: Math.random(),
+            fadeSpeed: Math.random() * 0.02 + 0.005
+        }));
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            fireflies.forEach(f => {
+                f.x += f.vx;
+                f.y += f.vy;
+                f.alpha += f.fadeSpeed;
+                if (f.alpha <= 0 || f.alpha >= 1) f.fadeSpeed *= -1;
+
+                if (f.x < 0 || f.x > canvas.width) f.vx *= -1;
+                if (f.y < 0 || f.y > canvas.height) f.vy *= -1;
+
+                ctx.fillStyle = accentColor;
+                ctx.globalAlpha = Math.abs(f.alpha);
+                ctx.beginPath();
+                ctx.arc(f.x, f.y, 3, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            ctx.globalAlpha = 1.0;
+            canvasAnimation = requestAnimationFrame(draw);
+        }
+        draw();
     }
 }
 
