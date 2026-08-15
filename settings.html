@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minimalist Hub - Settings</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <canvas id="bg-canvas"></canvas>
+    
+    <div id="app-container" class="sidebar-left">
+        <nav class="nav-bar">
+            <a href="index.html" class="nav-link">Home</a>
+            <a href="games.html" class="nav-link">Games</a>
+            <a href="shows.html" class="nav-link">Shows</a>
+            <a href="settings.html" class="nav-link active">⚙️</a>
+        </nav>
+
+        <main class="content">
+            <h2>Settings</h2>
+            
+            <div class="setting-group">
+                <label for="pos-select">Navigation Layout:</label><br>
+                <select id="pos-select" onchange="updateSidebarPos(this.value)">
+                    <option value="sidebar-left">Left Side</option>
+                    <option value="sidebar-right">Right Side</option>
+                    <option value="sidebar-bottom">Bottom Bar</option>
+                </select>
+            </div>
+
+            <div class="setting-group">
+                <label for="bg-select">Background Animation:</label><br>
+                <select id="bg-select" onchange="updateBgMode(this.value)">
+                    <option value="particles">Floating Particles</option>
+                    <option value="matrix">Matrix Rain</option>
+                    <option value="none">Solid Dark</option>
+                </select>
+            </div>
+
+            <div class="setting-group">
+                <label for="color-picker">Accent Border Color:</label><br>
+                <input type="color" id="color-picker" onchange="updateBorderColor(this.value)">
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
