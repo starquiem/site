@@ -3,46 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shows - Minimalist Hub</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Minimalist Hub - Shows</title>
+    <link rel="stylesheet" href="./style.css">
 </head>
 <body>
+
+    <div id="loader-overlay">
+        <div class="loader-title">LOADING SHOWS...</div>
+        <div class="loader-bar-container">
+            <div id="loader-bar" class="loader-bar"></div>
+        </div>
+    </div>
+
     <canvas id="bg-canvas"></canvas>
-    
+
     <div id="app-container" class="sidebar-left">
         <nav class="nav-bar">
-            <a href="index.html" class="nav-link">Home</a>
-            <a href="games.html" class="nav-link">Games</a>
-            <a href="shows.html" class="nav-link active">Shows</a>
-            <a href="favorites.html" class="nav-link">⭐ Favs</a>
-            <a href="settings.html" class="nav-link">⚙️</a>
+            <a href="index.html" class="nav-link" id="nav-index" title="Catalog">
+                <svg viewBox="0 0 24 24" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+            </a>
+
+            <div class="nav-divider"></div>
+            <div class="nav-section-title">Categories</div>
+
+            <a href="games.html" class="nav-link" id="nav-games" title="Games">
+                <svg viewBox="0 0 24 24" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"></rect><path d="M6 12h4m-2-2v4m8-2h.01m2 0h.01"></path></svg>
+            </a>
+            <a href="shows.html" class="nav-link" id="nav-shows" title="Shows">
+                <svg viewBox="0 0 24 24" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect><polyline points="17 2 12 7 7 2"></polyline></svg>
+            </a>
+
+            <div class="nav-divider"></div>
+
+            <a href="favorites.html" class="nav-link" id="nav-favorites" title="Favorites">
+                <svg viewBox="0 0 24 24" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+            </a>
+            <a href="settings.html" class="nav-link" id="nav-settings" title="Settings">
+                <svg viewBox="0 0 24 24" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+            </a>
         </nav>
 
         <main class="content">
-            <h2>Shows Library</h2>
-            <div class="search-container">
-                <input type="text" id="search-bar" class="search-bar" placeholder="Search shows...">
-            </div>
-            
-            <div class="grid" id="catalog-grid">
-                <div class="card">
-                    <button class="fav-btn" onclick="window.toggleFavorite('show1', 'Cyber Tales', 'https://via.placeholder.com/160x200', this, event)">☆</button>
-                    <a href="play.html" style="text-decoration: none; color: inherit; height: 100%; display: flex; flex-direction: column;">
-                        <div class="card-title">Cyber Tales</div>
-                        <div class="card-img-container"><img src="https://via.placeholder.com/160x200" alt="Cyber Tales"></div>
-                    </a>
-                </div>
-                <div class="card">
-                    <button class="fav-btn" onclick="window.toggleFavorite('show2', 'Cosmic Journey', 'https://via.placeholder.com/160x200', this, event)">☆</button>
-                    <a href="play.html" style="text-decoration: none; color: inherit; height: 100%; display: flex; flex-direction: column;">
-                        <div class="card-title">Cosmic Journey</div>
-                        <div class="card-img-container"><img src="https://via.placeholder.com/160x200" alt="Cosmic Journey"></div>
+            <div class="section-header">Shows Catalog</div>
+            <div id="catalog-grid" class="grid">
+                <div class="card" data-game-id="show-sample">
+                    <button class="fav-btn">☆</button>
+                    <a href="play.html?src=https://example.com&id=show-sample" style="text-decoration: none; color: inherit; display: flex; flex-direction: column; flex: 1;">
+                        <div class="card-img-container"><img src="https://via.placeholder.com/300x200" alt="Sample Show"></div>
+                        <div class="card-title">Sample Show</div>
                     </a>
                 </div>
             </div>
         </main>
     </div>
 
-    <script type="module" src="script.js"></script>
+    <script type="module" src="./script.js"></script>
 </body>
 </html>
