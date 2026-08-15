@@ -11,34 +11,44 @@
     
     <div id="app-container" class="sidebar-left">
         <nav class="nav-bar">
-            <a href="index.html" class="nav-link">Home</a>
-            <a href="games.html" class="nav-link active">Games</a>
-            <a href="shows.html" class="nav-link">Shows</a>
-            <a href="favorites.html" class="nav-link">⭐ Favs</a>
-            <a href="settings.html" class="nav-link">⚙️</a>
+            <a href="index.html" class="nav-link" title="Home">🏠</a>
+            <a href="games.html" class="nav-link active" title="Games">🎮</a>
+            <a href="shows.html" class="nav-link" title="Shows">📺</a>
+            <a href="favorites.html" class="nav-link" title="Favorites">⭐</a>
+            <a href="settings.html" class="nav-link" title="Settings">⚙️</a>
         </nav>
 
         <main class="content">
-            <h2>Games Library</h2>
             <div class="search-container">
                 <input type="text" id="search-bar" class="search-bar" placeholder="Search games...">
             </div>
-            
-            <div class="grid" id="catalog-grid">
+
+            <!-- ID matches the JS sort function -->
+            <div id="catalog-grid" class="grid">
+                
+                <!-- Example Game Card -->
                 <div class="card">
-                    <button class="fav-btn" onclick="window.toggleFavorite('sample_game', 'Sample Clicker Game', 'https://via.placeholder.com/160x200', this, event)">☆</button>
-                    <a href="play.html?src=games/sample-game.html" style="text-decoration: none; color: inherit; height: 100%; display: flex; flex-direction: column;">
-                        <div class="card-title">Sample Clicker Game</div>
+                    <button class="fav-btn" onclick="window.toggleFavorite('game-1v1lol', '1v1.lol', 'https://via.placeholder.com/300x200', this, event)">☆</button>
+                    <a href="play.html?src=https://example.com&id=game-1v1lol" style="text-decoration: none; color: inherit; display: flex; flex-direction: column; flex: 1;">
                         <div class="card-img-container">
-                            <img src="https://via.placeholder.com/160x200" alt="Sample Clicker Game">
+                            <img src="https://via.placeholder.com/300x200" alt="1v1.lol">
                         </div>
+                        <div class="card-title">1v1.lol</div>
                     </a>
+                    <div class="card-actions" data-game-id="game-1v1lol">
+                        <div class="rating-group">
+                            <button class="rate-btn rate-like" onclick="window.handleRating('game-1v1lol', 'like', this, event)">👍 0</button>
+                            <button class="rate-btn rate-dislike" onclick="window.handleRating('game-1v1lol', 'dislike', this, event)">👎 0</button>
+                        </div>
+                    </div>
                 </div>
-                <!-- You can add more game cards here using the exact same structure -->
+
+                <!-- Add more cards following the format above -->
+
             </div>
         </main>
     </div>
-
+    
     <script type="module" src="script.js"></script>
 </body>
 </html>
