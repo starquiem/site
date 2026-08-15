@@ -6,7 +6,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const savedVisibility = localStorage.getItem('sidebarVisibility') || 'always';
     const savedTheme = localStorage.getItem('themeMode') || 'dark';
 
-    // Apply root CSS variables & themes
     document.documentElement.style.setProperty('--border-color', savedColor);
     if (savedTheme === 'light') document.body.classList.add('light-mode');
 
@@ -19,45 +18,61 @@ document.addEventListener('DOMContentLoaded', () => {
     initBackground(savedBg, savedColor);
 
     // Sync Settings form values
-    const elements = {
-        color: document.getElementById('color-picker'),
-        pos: document.getElementById('pos-select'),
-        bg: document.getElementById('bg-select'),
-        vis: document.getElementById('visibility-select'),
-        theme: document.getElementById('theme-select')
-    };
+    const colorPicker = document.getElementById('color-picker');
+    const posSelect = document.getElementById('pos-select');
+    const bgSelect = document.getElementById('bg-select');
+    const visSelect = document.getElementById('visibility-select');
+    const themeSelect = document.getElementById('theme-select');
     
-    if (elements.color) elements.color.value = savedColor;
-    if (elements.pos) elements.pos.value = savedPos;
-    if (elements.bg) elements.bg.value = savedBg;
-    if (elements.vis) elements.vis.value = savedVisibility;
-    if (elements.theme) elements.theme.value = savedTheme;
+    if (colorPicker) colorPicker.value = savedColor;
+    if (posSelect) posSelect.value = savedPos;
+    if (bgSelect) bgSelect.value = savedBg;
+    if (visSelect) visSelect.value = savedVisibility;
+    if (themeSelect) themeSelect.value = savedTheme;
+
+    // Event listeners for settings changes
+    if (colorPicker) colorPicker.addEventListener('input', (e) => updateBorderColor(e.target.value));
+    if (posSelect) posSelect.addEventListener('change', (e) => updateSidebarPos(e.target.value));
+    if (bgSelect) bgSelect.addEventListener('change', (e) => updateBgMode(e.target.value));
+    if (visSelect) visSelect.addEventListener('change', (e) => updateSidebarVisibility(e.target.value));
+    if (themeSelect) themeSelect.addEventListener('change', (e) => updateTheme(e.target.value));
 
     // Search bar functionality
     const searchBar = document.getElementById('search-bar');
     if (searchBar) searchBar.addEventListener('input', filterCards);
 
+    // Auto-load iframe content on play.html if src parameter is supplied
+    const urlParams = new URLSearchParams(window.location.search);
+    const gameSrc = urlParams.get('src');
+    const gameId = urlParams.get('id') || 'current-game';
+    const gameFrame = document.getElementById('game-frame');
+    if (gameSrc && gameFrame) {
+        gameFrame.src = decodeURIComponent(gameSrc);
+        const playRating = document.getElementById('play-rating');
+        if (playRating) playRating.setAttribute('data-game-id', gameId);
+    }
+
     loadFavorites();
     sortAndRenderCatalog();
     initAllRatings();
+    setupGlobalEventListeners();
     
-    // Check Github login
     if (localStorage.getItem('gh_logged_in') === 'true') updateLoginUI(true);
 });
 
-// --- Settings Functions (Restored) ---
-export function updateTheme(theme) {
+// --- Settings Functions ---
+function updateTheme(theme) {
     theme === 'light' ? document.body.classList.add('light-mode') : document.body.classList.remove('light-mode');
     localStorage.setItem('themeMode', theme);
 }
 
-export function updateBorderColor(color) {
+function updateBorderColor(color) {
     document.documentElement.style.setProperty('--border-color', color);
     localStorage.setItem('borderColor', color);
     initBackground(localStorage.getItem('bgMode') || 'particles', color);
 }
 
-export function updateSidebarPos(pos) {
+function updateSidebarPos(pos) {
     const container = document.getElementById('app-container');
     if (!container) return;
     const isAutohide = container.classList.contains('sidebar-autohide');
@@ -66,19 +81,19 @@ export function updateSidebarPos(pos) {
     localStorage.setItem('sidebarPos', pos);
 }
 
-export function updateSidebarVisibility(mode) {
+function updateSidebarVisibility(mode) {
     const container = document.getElementById('app-container');
     if (!container) return;
     mode === 'autohide' ? container.classList.add('sidebar-autohide') : container.classList.remove('sidebar-autohide');
     localStorage.setItem('sidebarVisibility', mode);
 }
 
-export function updateBgMode(mode) {
+function updateBgMode(mode) {
     localStorage.setItem('bgMode', mode);
     initBackground(mode, localStorage.getItem('borderColor') || '#4CAF50');
 }
 
-// --- Data Export / Import (Restored) ---
+// --- Data Export / Import ---
 export function exportSaveData() {
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(localStorage));
     const downloadAnchor = document.createElement('a');
@@ -106,7 +121,7 @@ export function importSaveData(event) {
     reader.readAsText(file);
 }
 
-// --- GitHub Sign In (Restored) ---
+// --- GitHub Sign In ---
 export function loginWithGitHub() {
     localStorage.setItem('gh_logged_in', 'true');
     updateLoginUI(true);
@@ -123,10 +138,45 @@ function updateLoginUI(isLoggedIn) {
     }
 }
 
-// --- Like / Dislike System ---
-export function handleRating(gameId, type, buttonElement, event) {
-    if (event) event.preventDefault();
+// --- Robust Event Delegation (Fixes all click/button issues) ---
+function setupGlobalEventListeners() {
+    document.body.addEventListener('click', (e) => {
+        // Handle Like / Dislike clicks
+        const rateBtn = e.target.closest('.rate-btn');
+        if (rateBtn) {
+            e.preventDefault();
+            const actionsContainer = rateBtn.closest('[data-game-id]');
+            if (actionsContainer) {
+                const gameId = actionsContainer.getAttribute('data-game-id');
+                const type = rateBtn.classList.contains('rate-like') ? 'like' : 'dislike';
+                handleRating(gameId, type, actionsContainer);
+            }
+            return;
+        }
 
+        // Handle Favorite clicks
+        const favBtn = e.target.closest('.fav-btn');
+        if (favBtn) {
+            e.preventDefault();
+            const card = favBtn.closest('.card');
+            const gameId = card.getAttribute('data-game-id') || card.querySelector('a')?.href;
+            const title = card.querySelector('.card-title')?.textContent || 'Item';
+            const imgSrc = card.querySelector('img')?.src || '';
+            toggleFavorite(gameId, title, imgSrc, favBtn);
+            return;
+        }
+
+        // Handle Fullscreen button
+        if (e.target.closest('#fullscreen-btn')) {
+            e.preventDefault();
+            toggleFullscreen();
+            return;
+        }
+    });
+}
+
+// --- Like / Dislike System Logic ---
+function handleRating(gameId, type, containerElement) {
     let ratings = JSON.parse(localStorage.getItem('gameRatings')) || {};
     if (!ratings[gameId]) ratings[gameId] = { likes: 0, dislikes: 0, userVote: null };
 
@@ -151,10 +201,10 @@ export function handleRating(gameId, type, buttonElement, event) {
     }
 
     localStorage.setItem('gameRatings', JSON.stringify(ratings));
-    updateRatingUI(gameId, buttonElement.closest('.card-actions') || document.getElementById('play-rating'));
+    updateRatingUI(gameId, containerElement);
 }
 
-export function updateRatingUI(gameId, containerElement) {
+function updateRatingUI(gameId, containerElement) {
     if (!containerElement) return;
     
     let ratings = JSON.parse(localStorage.getItem('gameRatings')) || {};
@@ -171,8 +221,8 @@ export function updateRatingUI(gameId, containerElement) {
     }
 }
 
-export function initAllRatings() {
-    document.querySelectorAll('.card-actions').forEach(container => {
+function initAllRatings() {
+    document.querySelectorAll('[data-game-id]').forEach(container => {
         const gameId = container.getAttribute('data-game-id');
         if (gameId) updateRatingUI(gameId, container);
     });
@@ -245,14 +295,9 @@ function filterCards() {
 
 let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
 
-export function toggleFavorite(id, title, imgSrc, buttonElement, event) {
-    if (event) event.preventDefault();
+function toggleFavorite(id, title, imgSrc, buttonElement) {
     const index = favorites.findIndex(fav => fav.id === id);
-    
-    let itemLink = "play.html";
-    if (buttonElement && buttonElement.nextElementSibling && buttonElement.nextElementSibling.tagName === 'A') {
-        itemLink = buttonElement.nextElementSibling.getAttribute('href');
-    }
+    let itemLink = buttonElement.closest('.card')?.querySelector('a')?.href || "play.html";
     
     if (index === -1) {
         favorites.push({ id, title, imgSrc, link: itemLink });
@@ -264,6 +309,7 @@ export function toggleFavorite(id, title, imgSrc, buttonElement, event) {
         buttonElement.innerHTML = '☆';
     }
     localStorage.setItem('favorites', JSON.stringify(favorites));
+    loadFavorites();
 }
 
 function loadFavorites() {
@@ -279,8 +325,8 @@ function loadFavorites() {
 
     favorites.forEach(fav => {
         grid.innerHTML += `
-            <div class="card">
-                <button class="fav-btn active" onclick="window.toggleFavorite('${fav.id}', '${fav.title}', '${fav.imgSrc}', this, event); setTimeout(loadFavorites, 200);">★</button>
+            <div class="card" data-game-id="${fav.id}">
+                <button class="fav-btn active">★</button>
                 <a href="${fav.link}" style="text-decoration: none; color: inherit; display: flex; flex-direction: column; flex: 1;">
                     <div class="card-img-container"><img src="${fav.imgSrc}" alt="${fav.title}"></div>
                     <div class="card-title">${fav.title}</div>
@@ -289,7 +335,7 @@ function loadFavorites() {
     });
 }
 
-export function toggleFullscreen() {
+function toggleFullscreen() {
     const wrapper = document.querySelector('.iframe-wrapper') || document.getElementById('game-frame');
     if (!wrapper) return;
     !document.fullscreenElement ? wrapper.requestFullscreen() : document.exitFullscreen();
@@ -332,16 +378,7 @@ function initBackground(mode, accentColor) {
 
 window.addEventListener('resize', () => initBackground(localStorage.getItem('bgMode') || 'particles', localStorage.getItem('borderColor') || '#4CAF50'));
 
-// --- Ensure HTML onclick attributes can access functions ---
-window.updateTheme = updateTheme;
-window.updateBorderColor = updateBorderColor;
-window.updateSidebarPos = updateSidebarPos;
-window.updateSidebarVisibility = updateSidebarVisibility;
-window.updateBgMode = updateBgMode;
-window.sortAndRenderCatalog = sortAndRenderCatalog;
-window.toggleFullscreen = toggleFullscreen;
-window.toggleFavorite = toggleFavorite;
-window.handleRating = handleRating;
+// Expose necessary functions for settings page file inputs
 window.exportSaveData = exportSaveData;
 window.importSaveData = importSaveData;
 window.loginWithGitHub = loginWithGitHub;
