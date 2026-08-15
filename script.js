@@ -406,3 +406,6 @@ window.toggleFavorite = toggleFavorite;
 window.exportSaveData = exportSaveData;
 window.importSaveData = importSaveData;
 window.loginWithGitHub = loginWithGitHub;
+import confetti from 'https://esm.sh/canvas-confetti';
+
+confetti();
