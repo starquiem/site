@@ -157,12 +157,12 @@ function filterCards() {
 }
 
 export function toggleFullscreen() {
-    const gameFrame = document.getElementById('game-frame');
-    if (!gameFrame) return;
+    const wrapper = document.querySelector('.iframe-wrapper') || document.getElementById('game-frame');
+    if (!wrapper) return;
 
     if (!document.fullscreenElement) {
-        gameFrame.requestFullscreen().catch(err => {
-            alert(`Error attempting to enable fullscreen: ${err.message}`);
+        wrapper.requestFullscreen().catch(err => {
+            alert(`Fullscreen blocked: Make sure the content has loaded.`);
         });
     } else {
         document.exitFullscreen();
@@ -395,7 +395,6 @@ window.addEventListener('resize', () => {
     initBackground(savedBg, savedColor);
 });
 
-// --- EXPOSE FUNCTIONS TO WINDOW FOR ESM HTML INLINE EVENTS ---
 window.updateTheme = updateTheme;
 window.updateBorderColor = updateBorderColor;
 window.updateSidebarPos = updateSidebarPos;
