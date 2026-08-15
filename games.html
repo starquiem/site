@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minimalist Hub - Home</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏠</text></svg>">
+    <title>Minimalist Hub - Games</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎮</text></svg>">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -12,19 +12,58 @@
     
     <div id="app-container" class="sidebar-left">
         <nav class="nav-bar">
-            <a href="index.html" class="nav-link active">Home</a>
-            <a href="games.html" class="nav-link">Games</a>
+            <a href="index.html" class="nav-link">Home</a>
+            <a href="games.html" class="nav-link active">Games</a>
             <a href="shows.html" class="nav-link">Shows</a>
             <a href="favorites.html" class="nav-link">⭐ Favs</a>
             <a href="settings.html" class="nav-link">⚙️</a>
         </nav>
 
         <main class="content">
-            <h2>Welcome Home</h2>
-            <p style="margin-top: 10px;">Select a category from the sidebar to begin.</p>
+            <h2>Games Collection</h2>
+            
+            <div class="search-container">
+                <input type="text" id="search-bar" class="search-bar" placeholder="Search for a game...">
+            </div>
+
+            <div class="grid">
+                <div class="card">
+                    <button class="fav-btn" onclick="toggleFavorite('g1', 'Retro Racing', 'https://images.unsplash.com/photo-1612287230202-1ff1d85d1bdf?auto=format&fit=crop&w=300&q=80', this, event)">☆</button>
+                    <a href="play.html" style="text-decoration: none; color: inherit; height: 100%; display: flex; flex-direction: column;">
+                        <div class="card-title">Retro Racing</div>
+                        <div class="card-img-container">
+                            <img src="https://images.unsplash.com/photo-1612287230202-1ff1d85d1bdf?auto=format&fit=crop&w=300&q=80" alt="Retro Racing">
+                        </div>
+                    </a>
+                </div>
+
+                <div class="card">
+                    <button class="fav-btn" onclick="toggleFavorite('g2', 'Space Shooter', 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=300&q=80', this, event)">☆</button>
+                    <a href="play.html" style="text-decoration: none; color: inherit; height: 100%; display: flex; flex-direction: column;">
+                        <div class="card-title">Space Shooter</div>
+                        <div class="card-img-container">
+                            <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=300&q=80" alt="Space Shooter">
+                        </div>
+                    </a>
+                </div>
+            </div>
         </main>
     </div>
 
     <script src="script.js"></script>
+    <script>
+        // Set correct favorite stars on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedFavs = JSON.parse(localStorage.getItem('favorites')) || [];
+            document.querySelectorAll('.fav-btn').forEach(btn => {
+                const funcText = btn.getAttribute('onclick');
+                const idMatch = funcText.match(/'([^']+)'/); // Pulls 'g1' out of the string
+                if(idMatch && savedFavs.some(f => f.id === idMatch[1])) {
+                    btn.classList.add('active');
+                    btn.innerHTML = '★';
+                }
+            });
+        });
+    </script>
 </body>
 </html>
