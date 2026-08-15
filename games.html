@@ -3,16 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minimalist Hub - Games</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎮</text></svg>">
+    <title>Games - Minimalist Hub</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <canvas id="bg-canvas"></canvas>
-
-<div class="grid" id="catalog-grid">
-    </div>
-
     
     <div id="app-container" class="sidebar-left">
         <nav class="nav-bar">
@@ -24,50 +19,37 @@
         </nav>
 
         <main class="content">
-            <h2>Games Collection</h2>
-            
+            <h2>Games Library</h2>
             <div class="search-container">
-                <input type="text" id="search-bar" class="search-bar" placeholder="Search for a game...">
+                <input type="text" id="search-bar" class="search-bar" placeholder="Search games...">
             </div>
-
-            <div class="grid">
+            
+            <div class="grid" id="catalog-grid">
                 <div class="card">
-                    <button class="fav-btn" onclick="toggleFavorite('g1', 'Retro Racing', 'https://images.unsplash.com/photo-1612287230202-1ff1d85d1bdf?auto=format&fit=crop&w=300&q=80', this, event)">☆</button>
+                    <button class="fav-btn" onclick="window.toggleFavorite('game1', 'Adventure Quest', 'https://via.placeholder.com/160x200', this, event)">☆</button>
                     <a href="play.html" style="text-decoration: none; color: inherit; height: 100%; display: flex; flex-direction: column;">
-                        <div class="card-title">Retro Racing</div>
-                        <div class="card-img-container">
-                            <img src="https://images.unsplash.com/photo-1612287230202-1ff1d85d1bdf?auto=format&fit=crop&w=300&q=80" alt="Retro Racing">
-                        </div>
+                        <div class="card-title">Adventure Quest</div>
+                        <div class="card-img-container"><img src="https://via.placeholder.com/160x200" alt="Adventure Quest"></div>
                     </a>
                 </div>
-
                 <div class="card">
-                    <button class="fav-btn" onclick="toggleFavorite('g2', 'Space Shooter', 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=300&q=80', this, event)">☆</button>
+                    <button class="fav-btn" onclick="window.toggleFavorite('game2', 'Block Puzzle', 'https://via.placeholder.com/160x200', this, event)">☆</button>
                     <a href="play.html" style="text-decoration: none; color: inherit; height: 100%; display: flex; flex-direction: column;">
-                        <div class="card-title">Space Shooter</div>
-                        <div class="card-img-container">
-                            <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=300&q=80" alt="Space Shooter">
-                        </div>
+                        <div class="card-title">Block Puzzle</div>
+                        <div class="card-img-container"><img src="https://via.placeholder.com/160x200" alt="Block Puzzle"></div>
+                    </a>
+                </div>
+                <div class="card">
+                    <button class="fav-btn" onclick="window.toggleFavorite('game3', '2D Racer', 'https://via.placeholder.com/160x200', this, event)">☆</button>
+                    <a href="play.html" style="text-decoration: none; color: inherit; height: 100%; display: flex; flex-direction: column;">
+                        <div class="card-title">2D Racer</div>
+                        <div class="card-img-container"><img src="https://via.placeholder.com/160x200" alt="2D Racer"></div>
                     </a>
                 </div>
             </div>
         </main>
     </div>
 
-    <script src="script.js"></script>
-    <script>
-        // Set correct favorite stars on page load
-        document.addEventListener('DOMContentLoaded', () => {
-            const savedFavs = JSON.parse(localStorage.getItem('favorites')) || [];
-            document.querySelectorAll('.fav-btn').forEach(btn => {
-                const funcText = btn.getAttribute('onclick');
-                const idMatch = funcText.match(/'([^']+)'/); // Pulls 'g1' out of the string
-                if(idMatch && savedFavs.some(f => f.id === idMatch[1])) {
-                    btn.classList.add('active');
-                    btn.innerHTML = '★';
-                }
-            });
-        });
-    </script>
+    <script type="module" src="script.js"></script>
 </body>
 </html>
