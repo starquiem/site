@@ -264,3 +264,100 @@ window.importSaveData = function(event) {
     };
     reader.readAsText(file);
 };
+// script.js
+
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Theme Management
+    const themeSelect = document.getElementById('theme-select');
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+
+    // Apply saved theme on page load
+    if (savedTheme !== 'dark') {
+        document.body.classList.add(savedTheme);
+    }
+
+    if (themeSelect) {
+        themeSelect.value = savedTheme;
+        themeSelect.addEventListener('change', (e) => {
+            const selected = e.target.value;
+            
+            // Remove all existing theme classes
+            document.body.classList.remove('light-mode', 'hacker-mode', 'sakura-mode');
+            
+            // Apply new theme class if not default dark
+            if (selected !== 'dark') {
+                document.body.classList.add(selected);
+            }
+            
+            // Save preference
+            localStorage.setItem('theme', selected);
+        });
+    }
+
+    // 2. GitHub Sign-In Button Action
+    const githubBtn = document.getElementById('github-login-btn');
+    if (githubBtn) {
+        githubBtn.addEventListener('click', () => {
+            // Triggers action when clicked. Replace with your auth provider endpoint (e.g., Supabase/Firebase)
+            alert('GitHub sign-in action triggered! To connect live auth, integrate your authentication backend or OAuth redirect URL here.');
+        });
+    }
+
+    // 3. Background Canvas Animation
+    const canvas = document.getElementById('bg-canvas');
+    if (canvas) {
+        const ctx = canvas.getContext('2d');
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+
+        window.addEventListener('resize', () => {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        });
+
+        const particles = Array.from({ length: 30 }, () => ({
+            x: Math.random() * width,
+            y: Math.random() * height,
+            vx: (Math.random() - 0.5) * 0.4,
+            vy: (Math.random() - 0.5) * 0.4,
+            radius: Math.random() * 1.5 + 0.5
+        }));
+
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+            
+            particles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+                if (p.x < 0) p.x = width;
+                if (p.x > width) p.x = 0;
+                if (p.y < 0) p.y = height;
+                if (p.y > height) p.y = 0;
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            requestAnimationFrame(animate);
+        }
+        animate();
+    }
+
+    // 4. Loader Overlay Handler
+    const loader = document.getElementById('loader-overlay');
+    if (loader) {
+        const loaderBar = document.getElementById('loader-bar');
+        let progress = 0;
+        const interval = setInterval(() => {
+            progress += 25;
+            if (loaderBar) loaderBar.style.width = progress + '%';
+            if (progress >= 100) {
+                clearInterval(interval);
+                loader.classList.add('fade-out');
+                setTimeout(() => loader.style.display = 'none', 400);
+            }
+        }, 50);
+    }
+});
