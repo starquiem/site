@@ -19,7 +19,7 @@
 
     <div id="app-container" class="sidebar-left">
         <nav class="nav-bar">
-            <a href="./index.html" class="nav-link" id="nav-index" title="Catalog">
+            <a href="./index.html" class="nav-link active" id="nav-index" title="Catalog">
                 <svg viewBox="0 0 24 24" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
             </a>
 
@@ -56,19 +56,52 @@
                 <input type="text" id="search-bar" class="search-bar" placeholder="Search catalog...">
             </div>
 
+            <!-- Centered Discord Banner Button -->
+            <div class="discord-banner-container">
+                <a href="https://discord.gg/znuBx9cMDT" target="_blank" class="discord-cta-btn">
+                    <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 6h0a8.5 8.5 0 0 0-7-3.5c-3.2 0-6 1.8-7.5 4.5A11 11 0 0 0 2 16.5c1.5 2 4 3 6.5 2.5a8.5 8.5 0 0 0 3-1.5m6.5-11.5a10 10 0 0 1-3.5 6m3.5-6L17.5 9m-4.5 4.5h.01m3.99 0h.01"></path>
+                    </svg>
+                    <span>Join the Discord!</span>
+                </a>
+            </div>
+
+            <!-- Featured Slideshow Section -->
+            <div class="section-header">Featured Games</div>
+            <div class="slideshow-container">
+                <div class="slide fade active" style="background-image: url('https://via.placeholder.com/900x300/222/555');">
+                    <div class="slide-caption">
+                        <h3>1v1.lol</h3>
+                        <p>Build, shoot, and survive in this fast-paced action game.</p>
+                        <a href="./play.html?src=https://example.com&id=game-1v1lol" class="btn-primary" onclick="trackRecent('1v1.lol', 'https://via.placeholder.com/300x200', 'https://example.com', 'game-1v1lol')">Play Now</a>
+                    </div>
+                </div>
+                <div class="slide fade" style="background-image: url('https://via.placeholder.com/900x300/333/666');">
+                    <div class="slide-caption">
+                        <h3>Sample Game 2</h3>
+                        <p>Discover new adventures and challenges every day.</p>
+                        <a href="./play.html?src=https://example.com&id=game-sample2" class="btn-primary" onclick="trackRecent('Sample Game 2', 'https://via.placeholder.com/300x200', 'https://example.com', 'game-sample2')">Play Now</a>
+                    </div>
+                </div>
+                <button class="slide-prev" onclick="plusSlides(-1)">&#10094;</button>
+                <button class="slide-next" onclick="plusSlides(1)">&#10095;</button>
+            </div>
+
+            <!-- Recently Played Section -->
+            <div class="section-header">Recently Played</div>
+            <div id="recent-grid" class="grid">
+                <!-- Dynamically populated via script.js -->
+            </div>
+
+            <!-- Catalog Grid -->
+            <div class="section-header">All Games & Shows</div>
             <div id="catalog-grid" class="grid">
                 <div class="card" data-game-id="game-1v1lol">
-                    <button class="fav-btn">☆</button>
-                    <a href="./play.html?src=https://example.com&id=game-1v1lol" style="text-decoration: none; color: inherit; display: flex; flex-direction: column; flex: 1;">
+                    <button class="fav-btn" onclick="toggleFavorite(event, 'game-1v1lol')">☆</button>
+                    <a href="./play.html?src=https://example.com&id=game-1v1lol" onclick="trackRecent('1v1.lol', 'https://via.placeholder.com/300x200', 'https://example.com', 'game-1v1lol')" style="text-decoration: none; color: inherit; display: flex; flex-direction: column; flex: 1;">
                         <div class="card-img-container"><img src="https://via.placeholder.com/300x200" alt="1v1.lol"></div>
                         <div class="card-title">1v1.lol</div>
                     </a>
-                    <div class="card-actions" data-game-id="game-1v1lol">
-                        <div class="rating-group">
-                            <button class="rate-btn rate-like">👍 0</button>
-                            <button class="rate-btn rate-dislike">👎 0</button>
-                        </div>
-                    </div>
                 </div>
             </div>
         </main>
