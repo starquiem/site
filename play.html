@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Playing - Minimalist Hub</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>▶️</text></svg>">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <canvas id="bg-canvas"></canvas>
+    
+    <div id="app-container" class="sidebar-left">
+        <nav class="nav-bar">
+            <a href="index.html" class="nav-link">Home</a>
+            <a href="games.html" class="nav-link">Games</a>
+            <a href="shows.html" class="nav-link">Shows</a>
+            <a href="favorites.html" class="nav-link">⭐ Favs</a>
+            <a href="settings.html" class="nav-link">⚙️</a>
+        </nav>
+
+        <main class="content">
+            <div class="play-container">
+                <div class="action-bar" style="margin-bottom: 15px;">
+                    <h2>Currently Playing</h2>
+                    <button class="btn-primary" onclick="window.history.back()">← Back</button>
+                </div>
+
+                <div class="iframe-wrapper">
+                    <iframe id="game-frame" src="https://example.com" allowfullscreen></iframe>
+                </div>
+
+                <div class="action-bar">
+                    <button class="btn-primary" onclick="toggleFullscreen()">🔲 Fullscreen</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
