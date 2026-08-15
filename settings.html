@@ -38,7 +38,7 @@
             <a href="./favorites.html" class="nav-link" id="nav-favorites" title="Favorites">
                 <svg viewBox="0 0 24 24" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
             </a>
-            <a href="./settings.html" class="nav-link" id="nav-settings" title="Settings">
+            <a href="./settings.html" class="nav-link active" id="nav-settings" title="Settings">
                 <svg viewBox="0 0 24 24" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
             </a>
 
@@ -52,62 +52,26 @@
         </nav>
 
         <main class="content">
-            <div class="section-header">Settings & Customization</div>
+            <h2 class="section-header">Settings</h2>
 
             <div class="settings-section">
-                <div class="settings-group">
-                    <label for="color-picker">Accent & Border Color</label>
-                    <input type="color" id="color-picker" value="#4CAF50">
-                </div>
-
+                <div class="section-header" style="margin-top:0;">Appearance</div>
                 <div class="settings-group">
                     <label for="theme-select">Theme Mode</label>
                     <select id="theme-select">
-                        <option value="dark">Dark Mode</option>
-                        <option value="light">Light Mode</option>
-                    </select>
-                </div>
-
-                <div class="settings-group">
-                    <label for="pos-select">Sidebar Position</label>
-                    <select id="pos-select">
-                        <option value="sidebar-left">Left</option>
-                        <option value="sidebar-right">Right</option>
-                    </select>
-                </div>
-
-                <div class="settings-group">
-                    <label for="visibility-select">Sidebar Visibility</label>
-                    <select id="visibility-select">
-                        <option value="always">Always Visible</option>
-                        <option value="autohide">Auto-Hide on Hover</option>
-                    </select>
-                </div>
-
-                <div class="settings-group">
-                    <label for="bg-select">Background Animation</label>
-                    <select id="bg-select">
-                        <option value="particles">Particles</option>
-                        <option value="none">None</option>
+                        <option value="dark">Dark (Default)</option>
+                        <option value="light-mode">Light</option>
+                        <option value="hacker-mode">Hacker</option>
+                        <option value="sakura-mode">Sakura</option>
                     </select>
                 </div>
             </div>
 
             <div class="settings-section">
+                <div class="section-header" style="margin-top:0;">Account & Authentication</div>
                 <div class="settings-group">
-                    <label>Save Data Backup</label>
-                    <button class="btn-primary" onclick="exportSaveData()">Export Backup (.json)</button>
-                </div>
-                <div class="settings-group">
-                    <label for="import-file">Restore Save Data</label>
-                    <input type="file" id="import-file" accept=".json" onchange="importSaveData(event)">
-                </div>
-            </div>
-
-            <div class="settings-section">
-                <div class="settings-group">
-                    <label>Account Integration</label>
-                    <button id="login-btn" class="btn-primary" onclick="loginWithGitHub()">Sign in with GitHub</button>
+                    <label>Sign in with GitHub</label>
+                    <button id="github-login-btn" class="btn-primary">Sign in with GitHub</button>
                 </div>
             </div>
         </main>
