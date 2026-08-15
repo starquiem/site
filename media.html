@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minimalist Hub - Shows</title>
+    <title>Minimalist Hub - Media</title>
     <link rel="stylesheet" href="./style.css">
 </head>
 <body>
 
     <div id="loader-overlay">
-        <div class="loader-title">LOADING SHOWS...</div>
+        <div class="loader-title">LOADING MEDIA...</div>
         <div class="loader-bar-container">
             <div id="loader-bar" class="loader-bar"></div>
         </div>
@@ -29,7 +29,7 @@
             <a href="./games.html" class="nav-link" id="nav-games" title="Games">
                 <svg viewBox="0 0 24 24" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"></rect><path d="M6 12h4m-2-2v4m8-2h.01m2 0h.01"></path></svg>
             </a>
-            <a href="./shows.html" class="nav-link" id="nav-shows" title="Shows">
+            <a href="./media.html" class="nav-link active" id="nav-media" title="Media">
                 <svg viewBox="0 0 24 24" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect><polyline points="17 2 12 7 7 2"></polyline></svg>
             </a>
 
@@ -52,15 +52,23 @@
         </nav>
 
         <main class="content">
-            <div class="section-header">Shows Catalog</div>
-            <div id="catalog-grid" class="grid">
-                <div class="card" data-game-id="show-sample">
-                    <button class="fav-btn">☆</button>
-                    <a href="./play.html?src=https://example.com&id=show-sample" style="text-decoration: none; color: inherit; display: flex; flex-direction: column; flex: 1;">
-                        <div class="card-img-container"><img src="https://via.placeholder.com/300x200" alt="Sample Show"></div>
-                        <div class="card-title">Sample Show</div>
-                    </a>
-                </div>
+            <!-- Enlarged Banner -->
+            <div class="recommended-banner">
+                <h2>Explore Media</h2>
+                <p>Stream your favorite shows, videos, and media content seamlessly.</p>
+            </div>
+
+            <!-- Sleek Search Bar -->
+            <div class="search-container">
+                <svg viewBox="0 0 24 24" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" id="searchInput" class="search-bar" placeholder="Search media...">
+            </div>
+
+            <div class="grid-container" id="content-grid">
+                <!-- Media cards go here -->
             </div>
         </main>
     </div>
