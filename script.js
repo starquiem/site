@@ -394,3 +394,16 @@ window.addEventListener('resize', () => {
     const savedBg = localStorage.getItem('bgMode') || 'particles';
     initBackground(savedBg, savedColor);
 });
+
+// --- EXPOSE FUNCTIONS TO WINDOW FOR ESM HTML INLINE EVENTS ---
+window.updateTheme = updateTheme;
+window.updateBorderColor = updateBorderColor;
+window.updateSidebarPos = updateSidebarPos;
+window.updateSidebarVisibility = updateSidebarVisibility;
+window.updateBgMode = updateBgMode;
+window.sortAndRenderCatalog = sortAndRenderCatalog;
+window.toggleFullscreen = toggleFullscreen;
+window.toggleFavorite = toggleFavorite;
+window.exportSaveData = exportSaveData;
+window.importSaveData = importSaveData;
+window.loginWithGitHub = loginWithGitHub;
