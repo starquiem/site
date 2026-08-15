@@ -29,7 +29,7 @@
             <a href="./games.html" class="nav-link" id="nav-games" title="Games">
                 <svg viewBox="0 0 24 24" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"></rect><path d="M6 12h4m-2-2v4m8-2h.01m2 0h.01"></path></svg>
             </a>
-            <a href="./shows.html" class="nav-link" id="nav-shows" title="Shows">
+            <a href="./media.html" class="nav-link" id="nav-media" title="Media">
                 <svg viewBox="0 0 24 24" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect><polyline points="17 2 12 7 7 2"></polyline></svg>
             </a>
 
@@ -52,26 +52,31 @@
         </nav>
 
         <main class="content">
-            <h2 class="section-header">Settings</h2>
+            <!-- Enlarged Banner -->
+            <div class="recommended-banner">
+                <h2>Hub Settings</h2>
+                <p>Personalize your visual themes, account session, and preferences.</p>
+            </div>
 
-            <div class="settings-section">
-                <div class="section-header" style="margin-top:0;">Appearance</div>
-                <div class="settings-group">
-                    <label for="theme-select">Theme Mode</label>
-                    <select id="theme-select">
-                        <option value="dark">Dark (Default)</option>
-                        <option value="light-mode">Light</option>
-                        <option value="hacker-mode">Hacker</option>
-                        <option value="sakura-mode">Sakura</option>
-                    </select>
+            <!-- Theme Settings Section -->
+            <div class="settings-section" style="margin-bottom: 30px;">
+                <h3 style="margin-bottom: 12px; color: var(--text-main, #fff);">Visual Themes</h3>
+                <p style="color: var(--text-muted, #a0a0c0); margin-bottom: 15px; font-size: 0.95rem;">Select your preferred color palette across the entire site:</p>
+                
+                <div class="theme-buttons-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px;">
+                    <button class="theme-btn" data-theme="dark" style="padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: #fff; cursor: pointer; font-weight: 600; transition: 0.2s;">Dark (Default)</button>
+                    <button class="theme-btn" data-theme="light-mode" style="padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: #fff; cursor: pointer; font-weight: 600; transition: 0.2s;">Light Mode</button>
+                    <button class="theme-btn" data-theme="hacker-mode" style="padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: #fff; cursor: pointer; font-weight: 600; transition: 0.2s;">Hacker Matrix</button>
+                    <button class="theme-btn" data-theme="sakura-mode" style="padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: #fff; cursor: pointer; font-weight: 600; transition: 0.2s;">Sakura Blossom</button>
+                    <button class="theme-btn" data-theme="synthwave-mode" style="padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: #fff; cursor: pointer; font-weight: 600; transition: 0.2s;">Synthwave Neon</button>
                 </div>
             </div>
 
+            <!-- Account Settings Section -->
             <div class="settings-section">
-                <div class="section-header" style="margin-top:0;">Account & Authentication</div>
-                <div class="settings-group">
-                    <label>Sign in with GitHub</label>
-                    <button id="github-login-btn" class="btn-primary">Sign in with GitHub</button>
+                <h3 style="margin-bottom: 12px; color: var(--text-main, #fff);">Account & Data</h3>
+                <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                    <button id="github-login-btn" style="padding: 12px 20px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.08); color: #fff; cursor: pointer; font-weight: 600;">Sign in with GitHub</button>
                 </div>
             </div>
         </main>
