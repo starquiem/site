@@ -10,7 +10,6 @@
     <canvas id="bg-canvas"></canvas>
     
     <div id="app-container" class="sidebar-left">
-        <!-- Glassmorphism Icon Sidebar -->
         <nav class="nav-bar">
             <a href="index.html" class="nav-link" title="Home">🏠</a>
             <a href="games.html" class="nav-link" title="Games">🎮</a>
@@ -25,7 +24,6 @@
                     <iframe id="game-frame" src="about:blank" allow="fullscreen; autoplay; gamepad; clipboard-write"></iframe>
                 </div>
                 
-                <!-- Modern Action Bar with Ratings -->
                 <div class="action-bar">
                     <button class="btn-primary" onclick="window.history.back()">← Back</button>
                     
@@ -41,7 +39,6 @@
     </div>
 
     <script>
-        // Auto-loads game from URL instantly
         (function() {
             const params = new URLSearchParams(window.location.search);
             const gameSrc = params.get('src');
@@ -52,12 +49,14 @@
                     const frame = document.getElementById('game-frame');
                     if (frame) frame.src = decodeURIComponent(gameSrc);
                     
-                    // Set the rating ID to match the game
                     const ratingContainer = document.getElementById('play-rating');
                     if (ratingContainer) {
                         ratingContainer.setAttribute('data-game-id', gameId);
                         ratingContainer.querySelector('.rate-like').setAttribute('onclick', `window.handleRating('${gameId}', 'like', this, event)`);
                         ratingContainer.querySelector('.rate-dislike').setAttribute('onclick', `window.handleRating('${gameId}', 'dislike', this, event)`);
+                        
+                        // Initialize counts instantly for this view
+                        if (window.updateRatingUI) window.updateRatingUI(gameId, ratingContainer);
                     }
                 });
             }
