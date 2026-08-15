@@ -46,17 +46,18 @@ body {
     width: 100%;
 }
 
-/* --- ICON SIDEBAR NAVIGATION (Solid & Crisp) --- */
+/* --- ICON SIDEBAR NAVIGATION (Spaced & Locked) --- */
 .nav-bar {
-    width: 75px;
+    width: 85px;
     background: var(--nav-bg);
     border-right: var(--border-style);
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 25px 0;
-    gap: 20px;
+    padding: 35px 0;
+    gap: 35px; /* Spaced out icons */
     z-index: 100;
+    flex-shrink: 0; /* Prevents sidebar from squishing */
     transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
@@ -64,12 +65,15 @@ body {
     color: var(--text-color);
     text-decoration: none;
     font-size: 24px;
-    width: 48px;
-    height: 48px;
+    width: 50px;
+    height: 50px;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 12px;
+    flex-shrink: 0; /* Prevents icon distortion */
+    white-space: nowrap; /* Stops text replacement */
+    overflow: hidden; /* Hides any accidental text overflow */
     transition: background 0.2s ease, transform 0.2s ease;
 }
 
@@ -90,7 +94,7 @@ body {
 
 #app-container.sidebar-autohide.sidebar-left .nav-bar {
     position: fixed; left: 0; top: 0; height: 100vh;
-    transform: translateX(calc(-100% + 12px));
+    transform: translateX(calc(-100% + 14px));
     opacity: 0.2;
 }
 #app-container.sidebar-autohide.sidebar-left .nav-bar:hover {
@@ -100,7 +104,7 @@ body {
 
 #app-container.sidebar-autohide.sidebar-right .nav-bar {
     position: fixed; right: 0; top: 0; height: 100vh;
-    transform: translateX(calc(100% - 12px));
+    transform: translateX(calc(100% - 14px));
     opacity: 0.2;
 }
 #app-container.sidebar-autohide.sidebar-right .nav-bar:hover {
@@ -141,7 +145,7 @@ body {
     border-bottom: var(--border-style);
 }
 
-/* --- CARDS (Old Solid Style + New Ratings) --- */
+/* --- CARDS & RATINGS --- */
 .grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -184,7 +188,6 @@ body {
     text-align: center;
 }
 
-/* --- RATINGS & FAVORITES --- */
 .card-actions {
     display: flex;
     justify-content: center;
@@ -230,7 +233,7 @@ body {
 
 .fav-btn.active { color: #FFD700; }
 
-/* --- PLAY PAGE OVERHAUL (Solid & Minimal) --- */
+/* --- PLAY PAGE --- */
 .play-container { display: flex; flex-direction: column; height: 85vh; gap: 15px; }
 
 .iframe-wrapper {
@@ -262,7 +265,7 @@ body {
 }
 .btn-primary:hover { opacity: 0.9; }
 
-/* Settings form fields formatting */
+/* Settings Form Fields */
 .settings-group { margin-bottom: 20px; }
 .settings-group label { display: block; margin-bottom: 5px; font-weight: bold; }
 select, input[type="color"], input[type="file"] {
