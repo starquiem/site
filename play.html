@@ -3,93 +3,151 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minimalist Hub - Play</title>
+    <title>Play - Minimalist Hub</title>
     <link rel="stylesheet" href="./style.css">
+    <style>
+        /* Player specific styles to fix squished iframe bug */
+        .play-layout {
+            padding: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .top-controls {
+            margin-bottom: 20px;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-muted);
+            text-decoration: none;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            transition: all 0.2s ease;
+            font-weight: 600;
+        }
+
+        .back-btn:hover {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .player-container {
+            flex: 1; /* This forces the container to take up all remaining screen space */
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+        }
+
+        .player-header {
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .player-header h2 {
+            margin: 0;
+            color: var(--accent-color);
+            font-size: 1.5rem;
+        }
+
+        .fullscreen-btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: rgba(255,255,255,0.08);
+            color: var(--text-main);
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .fullscreen-btn:hover {
+            background: rgba(255,255,255,0.15);
+        }
+
+        /* The actual iframe fix */
+        .iframe-wrapper {
+            flex: 1; /* Takes up the rest of the player container */
+            width: 100%;
+        }
+
+        .iframe-wrapper iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block; /* Removes inline spacing bugs */
+        }
+    </style>
 </head>
 <body>
 
-    <div id="loader-overlay">
-        <div class="loader-title">LOADING GAME...</div>
-        <div class="loader-bar-container">
-            <div id="loader-bar" class="loader-bar"></div>
-        </div>
-    </div>
-
     <canvas id="bg-canvas"></canvas>
 
-    <div id="app-container" class="sidebar-left">
-        <nav class="nav-bar">
-            <a href="./index.html" class="nav-link" id="nav-index" title="Catalog">
-                <svg viewBox="0 0 24 24" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-            </a>
+    <div id="app-container" style="margin-left: 0;"> <!-- Overriding sidebar margin for full width -->
+        <main class="play-layout">
+            
+            <div class="top-controls">
+                <a href="#" onclick="history.back(); return false;" class="back-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                    Back to Hub
+                </a>
+            </div>
 
-            <div class="nav-divider"></div>
-            <div class="nav-section-title">Categories</div>
-
-            <a href="./games.html" class="nav-link" id="nav-games" title="Games">
-                <svg viewBox="0 0 24 24" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"></rect><path d="M6 12h4m-2-2v4m8-2h.01m2 0h.01"></path></svg>
-            </a>
-            <a href="./shows.html" class="nav-link" id="nav-shows" title="Shows">
-                <svg viewBox="0 0 24 24" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect><polyline points="17 2 12 7 7 2"></polyline></svg>
-            </a>
-
-            <div class="nav-divider"></div>
-
-            <a href="./favorites.html" class="nav-link" id="nav-favorites" title="Favorites">
-                <svg viewBox="0 0 24 24" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-            </a>
-            <a href="./settings.html" class="nav-link" id="nav-settings" title="Settings">
-                <svg viewBox="0 0 24 24" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-            </a>
-
-            <div class="nav-divider"></div>
-
-            <a href="https://discord.gg/znuBx9cMDT" target="_blank" class="nav-link discord-link" title="Join Discord">
-                <svg viewBox="0 0 24 24" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M18 6h0a8.5 8.5 0 0 0-7-3.5c-3.2 0-6 1.8-7.5 4.5A11 11 0 0 0 2 16.5c1.5 2 4 3 6.5 2.5a8.5 8.5 0 0 0 3-1.5m6.5-11.5a10 10 0 0 1-3.5 6m3.5-6L17.5 9m-4.5 4.5h.01m3.99 0h.01"></path>
-                </svg>
-            </a>
-        </nav>
-
-        <main class="content player-content">
-            <div class="player-header">
-                <a href="./index.html" class="btn-primary">&larr; Back</a>
-                <h2 id="game-title">Loading Game...</h2>
-                <div class="player-actions">
-                    <button id="fullscreen-btn" class="btn-primary" onclick="toggleFullscreen()">Fullscreen</button>
+            <div class="player-container">
+                <div class="player-header">
+                    <h2 id="game-title">Loading...</h2>
+                    <button id="fullscreen-btn" class="fullscreen-btn">Fullscreen</button>
+                </div>
+                
+                <div class="iframe-wrapper">
+                    <iframe id="game-frame" src="" allowfullscreen></iframe>
                 </div>
             </div>
 
-            <div class="game-frame-wrapper" id="frame-wrapper">
-                <iframe id="game-iframe" src="" allowfullscreen></iframe>
-            </div>
         </main>
     </div>
 
-    <script type="module" src="./script.js"></script>
     <script>
-        window.addEventListener('DOMContentLoaded', () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const src = urlParams.get('src');
-            const title = urlParams.get('title') || 'Game Player';
+        // Reads the URL query parameters
+        document.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            const src = params.get('src');
+            const title = params.get('title');
 
-            document.getElementById('game-title').textContent = title;
-            if (src) {
-                document.getElementById('game-iframe').src = decodeURIComponent(src);
-            } else {
-                document.getElementById('game-iframe').src = 'about:blank';
-                document.getElementById('game-title').textContent = 'No game source provided.';
-            }
+            if(title) document.getElementById('game-title').textContent = title;
+            if(src) document.getElementById('game-frame').src = src;
+
+            // Fullscreen Functionality
+            const fullscreenBtn = document.getElementById('fullscreen-btn');
+            const iframe = document.getElementById('game-frame');
+
+            fullscreenBtn.addEventListener('click', () => {
+                if (iframe.requestFullscreen) {
+                    iframe.requestFullscreen();
+                } else if (iframe.webkitRequestFullscreen) { /* Safari */
+                    iframe.webkitRequestFullscreen();
+                } else if (iframe.msRequestFullscreen) { /* IE11 */
+                    iframe.msRequestFullscreen();
+                }
+            });
         });
-
-        function toggleFullscreen() {
-            const wrapper = document.getElementById('frame-wrapper');
-            if (!document.fullscreenElement) {
-                if (wrapper.requestFullscreen) wrapper.requestFullscreen();
-            } else {
-                if (document.exitFullscreen) document.exitFullscreen();
-            }
-        }
     </script>
+    <script type="module" src="./script.js"></script>
 </body>
 </html>
