@@ -1,97 +1,47 @@
-/* style.css - Complete Stylesheet */
-
+/* =========================================
+   Base Variables & Resets
+   ========================================= */
 :root {
-    --bg-main: #0f0f13;
-    --sidebar-bg: #15151a;
-    --card-bg: #1a1a24;
-    --text-main: #ffffff;
-    --text-muted: #a0a0c0;
-    --accent-color: #6c5ce7;
-    --accent-hover: #8174e9;
-    --accent-success: #2ea043;
+    --bg-color: #0f172a;
+    --card-bg: rgba(255, 255, 255, 0.03);
     --border-color: rgba(255, 255, 255, 0.08);
-}
-
-/* Light Mode */
-body.light-mode {
-    --bg-main: #f4f5f7;
-    --sidebar-bg: #ffffff;
-    --card-bg: #ffffff;
-    --text-main: #111827;
-    --text-muted: #6b7280;
-    --accent-color: #3b82f6;
-    --border-color: rgba(0, 0, 0, 0.1);
-}
-
-/* Hacker Matrix */
-body.hacker-mode {
-    --bg-main: #050505;
-    --sidebar-bg: #0a0a0a;
-    --card-bg: #111111;
-    --text-main: #00ff41;
-    --text-muted: #008f11;
-    --accent-color: #00ff41;
-    --border-color: rgba(0, 255, 65, 0.2);
-}
-
-/* Sakura Blossom */
-body.sakura-mode {
-    --bg-main: #ffe6ea;
-    --sidebar-bg: #fff0f3;
-    --card-bg: #ffffff;
-    --text-main: #4a4a4a;
-    --text-muted: #8a7b82;
-    --accent-color: #ff8fab;
-    --border-color: rgba(255, 143, 171, 0.3);
-}
-
-/* Synthwave */
-body.synthwave-mode {
-    --bg-main: #2b00ff;
-    --sidebar-bg: #1c00a6;
-    --card-bg: #ff007f;
-    --text-main: #00ffff;
-    --text-muted: #ffb8ff;
-    --accent-color: #ff007f;
-    --border-color: rgba(0, 255, 255, 0.5);
-}
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --accent-color: #6366f1;
 }
 
 body {
-    background-color: var(--bg-main);
+    margin: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: var(--bg-color);
     color: var(--text-main);
+    display: flex;
     min-height: 100vh;
     overflow-x: hidden;
-    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-canvas#bg-canvas {
+#bg-canvas {
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
-    z-index: 0;
+    z-index: -1;
     pointer-events: none;
 }
 
 #app-container {
     display: flex;
-    min-height: 100vh;
-    position: relative;
-    z-index: 1;
+    width: 100%;
 }
 
-/* Sidebar Navigation */
+/* =========================================
+   Sidebar Navigation
+   ========================================= */
 .nav-bar {
     width: 70px;
-    background-color: var(--sidebar-bg);
+    background: rgba(15, 23, 42, 0.75);
+    backdrop-filter: blur(12px);
     border-right: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
@@ -99,162 +49,126 @@ canvas#bg-canvas {
     padding: 20px 0;
     position: fixed;
     height: 100vh;
-    z-index: 50;
-    transition: all 0.3s ease;
+    z-index: 100;
 }
 
 .nav-link {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
     display: flex;
-    justify-content: center;
     align-items: center;
-    margin-bottom: 10px;
+    justify-content: center;
     color: var(--text-muted);
+    margin-bottom: 12px;
     transition: all 0.2s ease;
     text-decoration: none;
 }
 
 .nav-link svg {
-    width: 24px;
-    height: 24px;
+    width: 22px;
+    height: 22px;
     stroke: currentColor;
 }
 
-.nav-link:hover {
-    color: var(--text-main);
-    background-color: rgba(255, 255, 255, 0.05);
-    transform: translateY(-2px);
-}
-
-.nav-link.active {
+.nav-link:hover, .nav-link.active {
+    background: rgba(99, 102, 241, 0.15);
     color: var(--accent-color);
-    background-color: rgba(108, 92, 231, 0.1);
-}
-
-.discord-link {
-    margin-top: auto;
-    color: #5865F2; /* Discord Blurple */
 }
 
 .nav-divider {
-    width: 32px;
+    width: 30px;
     height: 1px;
-    background-color: var(--border-color);
-    margin: 15px 0;
+    background: var(--border-color);
+    margin: 10px 0;
 }
 
 .nav-section-title {
     font-size: 0.65rem;
     text-transform: uppercase;
-    letter-spacing: 1px;
     color: var(--text-muted);
-    margin-bottom: 15px;
-    text-align: center;
-    width: 100%;
+    letter-spacing: 1px;
+    margin: 5px 0 10px 0;
+    writing-mode: vertical-lr;
+    transform: rotate(180deg);
 }
 
-/* Main Content Layout */
+/* =========================================
+   Main Content Layout
+   ========================================= */
 .content {
-    flex: 1;
     margin-left: 70px;
-    padding: 40px;
+    flex: 1;
+    padding: 30px 40px;
     max-width: 1400px;
 }
 
-/* --- Enlarged Recommended Banner / Hero --- */
 .recommended-banner {
-    width: 100%;
-    min-height: 340px;
-    background: linear-gradient(135deg, rgba(30, 30, 46, 0.95), rgba(15, 15, 25, 0.98)), var(--card-bg);
-    border-radius: 18px;
-    padding: 45px 50px;
-    margin-bottom: 30px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(168, 85, 247, 0.2) 100%);
     border: 1px solid var(--border-color);
-    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
-    position: relative;
-    overflow: hidden;
+    border-radius: 16px;
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
-.recommended-banner h1, .recommended-banner h2 {
-    font-size: 2.4rem;
-    font-weight: 700;
-    margin-bottom: 12px;
-    color: var(--text-main);
-    letter-spacing: -0.5px;
+.recommended-banner h2 {
+    margin: 0 0 10px 0;
+    font-size: 1.8rem;
 }
 
 .recommended-banner p {
-    font-size: 1.15rem;
+    margin: 0;
     color: var(--text-muted);
-    max-width: 650px;
-    line-height: 1.5;
 }
 
-/* --- Sleek Search Bar --- */
 .search-container {
-    position: relative;
-    width: 100%;
-    max-width: 450px;
-    margin-bottom: 25px;
+    margin-bottom: 30px;
 }
 
 .search-bar {
     width: 100%;
-    padding: 14px 20px 14px 45px;
-    background: rgba(255, 255, 255, 0.05);
+    max-width: 400px;
+    padding: 12px 20px;
+    background: var(--card-bg);
     border: 1px solid var(--border-color);
-    border-radius: 12px;
+    border-radius: 10px;
     color: var(--text-main);
     font-size: 0.95rem;
     outline: none;
-    transition: all 0.3s ease;
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+    transition: all 0.2s;
 }
 
 .search-bar:focus {
     border-color: var(--accent-color);
-    background: rgba(255, 255, 255, 0.08);
-    box-shadow: 0 0 15px rgba(108, 92, 231, 0.25);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
 }
 
-.search-container svg {
-    position: absolute;
-    left: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 18px;
-    height: 18px;
-    stroke: var(--text-muted);
-    pointer-events: none;
-}
-
-/* Grids & Cards */
+/* =========================================
+   Grid & Card Fixes (Stops massive cards)
+   ========================================= */
 .grid-container {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 25px;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 260px));
+    gap: 20px;
+    padding: 10px 0 30px 0;
 }
 
 .card {
-    background-color: var(--card-bg);
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
     border-radius: 12px;
     overflow: hidden;
-    transition: all 0.3s ease;
-    border: 1px solid var(--border-color);
     position: relative;
     display: flex;
     flex-direction: column;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-    border-color: var(--accent-color);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    border-color: rgba(255, 255, 255, 0.2);
 }
 
 .card-img-container {
@@ -268,7 +182,7 @@ canvas#bg-canvas {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.5s ease;
+    transition: transform 0.3s ease;
 }
 
 .card:hover .card-img-container img {
@@ -277,105 +191,59 @@ canvas#bg-canvas {
 
 .card-title {
     padding: 15px;
-    font-size: 1rem;
+    font-size: 0.95rem;
     font-weight: 600;
-    color: var(--text-main);
+    text-align: center;
+    margin: 0;
 }
 
-/* Favorites Button on Cards */
+/* =========================================
+   Star Button Fixes
+   ========================================= */
 .fav-btn {
     position: absolute;
     top: 10px;
     right: 10px;
-    background: rgba(0,0,0,0.6);
-    border: none;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
     border-radius: 50%;
-    width: 35px;
-    height: 35px;
-    color: white;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-size: 1.2rem;
     cursor: pointer;
     z-index: 10;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transition: all 0.2s;
-    backdrop-filter: blur(4px);
+    transition: all 0.2s ease;
 }
+
 .fav-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
     transform: scale(1.1);
 }
+
 .fav-btn.active {
-    color: #ffd700;
+    color: #fbbf24;
+    text-shadow: 0 0 8px rgba(251, 191, 36, 0.5);
 }
 
-/* --- Settings UI (Dropdowns) --- */
-.settings-section {
-    background-color: var(--card-bg);
-    padding: 30px;
-    border-radius: 12px;
-    border: 1px solid var(--border-color);
-    margin-bottom: 25px;
-}
-
-.settings-dropdown {
-    width: 100%;
-    max-width: 320px;
-    padding: 14px 16px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid var(--border-color);
-    border-radius: 10px;
-    color: var(--text-main);
-    font-size: 1rem;
-    outline: none;
-    cursor: pointer;
-    appearance: none;
-    -webkit-appearance: none;
-    /* Custom arrow icon inline */
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="%23a0a0c0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>');
-    background-repeat: no-repeat;
-    background-position: right 12px center;
-    background-size: 18px;
-    transition: border-color 0.3s;
-}
-
-.settings-dropdown:focus {
-    border-color: var(--accent-color);
-}
-
-/* Dropdown option styles (Only works in some browsers, mostly uses OS defaults) */
-.settings-dropdown option {
-    background-color: #1a1a24; 
-    color: #ffffff;
-}
-
-.auth-btn {
-    padding: 12px 24px;
-    border-radius: 10px;
-    border: 1px solid var(--border-color);
-    background: rgba(255,255,255,0.08);
-    color: var(--text-main);
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 1rem;
-    transition: all 0.2s;
-}
-.auth-btn:hover {
-    background: rgba(255,255,255,0.15);
-}
-
-/* Fullscreen Loader */
+/* =========================================
+   Loader Overlay
+   ========================================= */
 #loader-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
-    background-color: #000;
+    background: var(--bg-color);
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
     z-index: 9999;
     transition: opacity 0.4s ease;
 }
@@ -386,17 +254,16 @@ canvas#bg-canvas {
 }
 
 .loader-title {
-    font-size: 2rem;
-    letter-spacing: 4px;
-    margin-bottom: 20px;
     font-weight: 700;
-    color: #fff;
+    letter-spacing: 2px;
+    margin-bottom: 15px;
+    font-size: 1.1rem;
 }
 
 .loader-bar-container {
-    width: 300px;
-    height: 40px;
-    background-color: #222;
+    width: 200px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
     border-radius: 2px;
     overflow: hidden;
 }
@@ -404,6 +271,6 @@ canvas#bg-canvas {
 .loader-bar {
     width: 0%;
     height: 100%;
-    background-color: var(--accent-color, #6c5ce7);
-    transition: width 0.1s ease;
+    background: var(--accent-color);
+    transition: width 0.2s ease;
 }
