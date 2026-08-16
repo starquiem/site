@@ -118,6 +118,7 @@ body {
     border-radius: 12px;
     padding: 25px 30px;
     margin-bottom: 24px;
+    max-width: 900px; /* Restricts banner width so it looks sleek */
     width: 100%;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
 }
@@ -158,14 +159,16 @@ body {
 }
 
 /* =========================================
-   Responsive Grid & Cards
+   Responsive Grid & Card Fixes
    ========================================= */
 .grid-container {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    /* Locks columns to 260px wide to prevent stretching */
+    grid-template-columns: repeat(auto-fill, 260px);
     gap: 20px;
     padding: 10px 0 30px 0;
     width: 100%;
+    justify-content: start;
 }
 
 .card {
@@ -176,8 +179,7 @@ body {
     position: relative;
     display: flex;
     flex-direction: column;
-    width: 100%;
-    max-width: 100%;
+    width: 260px; /* Enforces strict width size */
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
