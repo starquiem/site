@@ -71,13 +71,11 @@ body {
     margin-bottom: 12px;
     transition: all 0.2s ease;
     text-decoration: none;
+}
+
 .nav-link svg {
     width: 22px;
     height: 22px;
-}
-
-/* Only apply stroke to line-art icons, leaving filled icons like Discord clean */
-.nav-link svg:not([fill="currentColor"]) {
     stroke: currentColor;
 }
 
@@ -104,6 +102,16 @@ body {
 }
 
 /* =========================================
+   Dedicated Discord Button Override
+   ========================================= */
+.nav-link.discord-link svg {
+    width: 22px;
+    height: 22px;
+    fill: currentColor !important;
+    stroke: none !important;
+}
+
+/* =========================================
    Main Content Area & Banners
    ========================================= */
 .content {
@@ -120,7 +128,7 @@ body {
     border-radius: 12px;
     padding: 25px 30px;
     margin-bottom: 24px;
-    max-width: 900px; /* Restricts banner width so it looks sleek */
+    max-width: 900px;
     width: 100%;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
 }
@@ -165,7 +173,6 @@ body {
    ========================================= */
 .grid-container {
     display: grid;
-    /* Locks columns to 260px wide to prevent stretching */
     grid-template-columns: repeat(auto-fill, 260px);
     gap: 20px;
     padding: 10px 0 30px 0;
@@ -181,7 +188,7 @@ body {
     position: relative;
     display: flex;
     flex-direction: column;
-    width: 260px; /* Enforces strict width size */
+    width: 260px;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
