@@ -1,49 +1,5 @@
-// script.js - Unified Hub Logic
+// script.js - Unified Hub Logic (HTML-Driven Version)
 
-// Master Catalog - Add your actual games and media links here
-const masterCatalog = {
-    games: [
-        { 
-            id: 'game-1', 
-            title: 'Subway Surfers', 
-            img: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=500&auto=format&fit=crop&q=60', 
-            src: 'https://math-games-9m2.pages.dev/subway-surfers', 
-            category: 'games' 
-        },
-        { 
-            id: 'game-2', 
-            title: 'Minecraft Classic', 
-            img: 'https://images.unsplash.com/photo-1614316311790-1c6f71d53e20?w=500&auto=format&fit=crop&q=60', 
-            src: 'https://classic.minecraft.net/', 
-            category: 'games' 
-        },
-        { 
-            id: 'game-3', 
-            title: 'Slope', 
-            img: 'https://images.unsplash.com/photo-1552820728-8b83bb6b773f?w=500&auto=format&fit=crop&q=60', 
-            src: 'https://math-games-9m2.pages.dev/slope', 
-            category: 'games' 
-        }
-    ],
-    media: [
-        { 
-            id: 'media-1', 
-            title: 'Lo-Fi Radio', 
-            img: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=500&auto=format&fit=crop&q=60', 
-            src: 'https://www.youtube.com/embed/jfKfPfyJRdk', 
-            category: 'media' 
-        },
-        { 
-            id: 'media-2', 
-            title: 'Anime Stream', 
-            img: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=500&auto=format&fit=crop&q=60', 
-            src: 'https://www.youtube.com/embed/5qap5aO4i9A', 
-            category: 'media' 
-        }
-    ]
-};
-
-// Global canvas animation frame tracker
 let animationFrameId;
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -78,18 +34,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const themeSelect = document.getElementById('theme-select');
     const savedTheme = localStorage.getItem('theme') || 'dark';
 
-    if (savedTheme !== 'dark') {
-        document.body.classList.add(savedTheme);
-    }
+    if (savedTheme !== 'dark') document.body.classList.add(savedTheme);
 
     if (themeSelect) {
         themeSelect.value = savedTheme;
         themeSelect.addEventListener('change', (e) => {
             const selected = e.target.value;
             document.body.classList.remove('light-mode', 'hacker-mode', 'sakura-mode', 'synthwave-mode');
-            if (selected !== 'dark') {
-                document.body.classList.add(selected);
-            }
+            if (selected !== 'dark') document.body.classList.add(selected);
             localStorage.setItem('theme', selected);
         });
     }
@@ -102,125 +54,130 @@ document.addEventListener('DOMContentLoaded', () => {
         particleSelect.value = savedParticles;
         particleSelect.addEventListener('change', (e) => {
             localStorage.setItem('hub_particles', e.target.value);
-            initCanvas(); // Restart canvas with new settings
+            initCanvas(); 
         });
     }
-
-    // Start background effect
     initCanvas();
 
-    // 4. Load Grids
-    loadContentGrid();
+    // 4. Initialize Data & Subsystems
+    updateStarUI(); // Updates the UI for any hardcoded HTML cards
     loadRecentlyPlayed();
     loadFavoritesGrid();
     initSearch();
     initGitHubAuth();
+
+    // 5. Global Click Listener for dynamically handling HTML cards
+    document.addEventListener('click', (e) => {
+        // Handle Favorite Click
+        if (e.target.classList.contains('fav-btn')) {
+            e.preventDefault();
+            const card = e.target.closest('.card');
+            if (!card) return;
+            
+            const id = card.getAttribute('data-id');
+            const title = card.getAttribute('data-title');
+            const img = card.getAttribute('data-img');
+            const src = card.getAttribute('data-src');
+            
+            toggleFavorite(id, title, img, src);
+        }
+        
+        // Handle Play Link Click
+        const playLink = e.target.closest('.play-link');
+        if (playLink) {
+            const card = playLink.closest('.card');
+            if (card) {
+                const id = card.getAttribute('data-id');
+                const title = card.getAttribute('data-title');
+                const img = card.getAttribute('data-img');
+                const src = card.getAttribute('data-src');
+                trackRecent(title, img, src, id);
+            }
+        }
+    });
 });
 
-// --- Background Particle Canvas Engine ---
-function initCanvas() {
-    const canvas = document.getElementById('bg-canvas');
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-
-    // Cancel old animation loop if user changes settings
-    if (animationFrameId) {
-        cancelAnimationFrame(animationFrameId);
-    }
-
-    let width = canvas.width = window.innerWidth;
-    let height = canvas.height = window.innerHeight;
-
-    window.addEventListener('resize', () => {
-        width = canvas.width = window.innerWidth;
-        height = canvas.height = window.innerHeight;
+// --- UI Sync Function ---
+// Scans HTML and highlights stars if they are saved in favorites
+function updateStarUI() {
+    const favorites = JSON.parse(localStorage.getItem('hub_favorites_v2')) || [];
+    document.querySelectorAll('.card').forEach(card => {
+        const id = card.getAttribute('data-id');
+        const btn = card.querySelector('.fav-btn');
+        if (btn && id) {
+            const isFav = favorites.some(f => f.id === id);
+            if (isFav) {
+                btn.classList.add('active');
+                btn.textContent = '★';
+            } else {
+                btn.classList.remove('active');
+                btn.textContent = '☆';
+            }
+        }
     });
-
-    const mode = localStorage.getItem('hub_particles') || 'default';
-
-    if (mode === 'none') {
-        ctx.clearRect(0, 0, width, height);
-        return; // Halt engine
-    }
-
-    let particles = [];
-    let count = mode === 'snow' ? 100 : (mode === 'fast' ? 70 : 40);
-
-    for (let i = 0; i < count; i++) {
-        particles.push({
-            x: Math.random() * width,
-            y: Math.random() * height,
-            vx: mode === 'fast' ? (Math.random() - 0.5) * 8 : (Math.random() - 0.5) * 0.5,
-            vy: mode === 'snow' ? Math.random() * 2 + 1 : (mode === 'fast' ? (Math.random() - 0.5) * 8 : (Math.random() - 0.5) * 0.5),
-            radius: mode === 'snow' ? Math.random() * 2 + 1 : Math.random() * 1.5 + 0.5
-        });
-    }
-
-    function render() {
-        ctx.clearRect(0, 0, width, height);
-        
-        // Snow mode looks better fully solid, otherwise transparent
-        ctx.fillStyle = mode === 'snow' ? 'rgba(255, 255, 255, 0.4)' : 'rgba(255, 255, 255, 0.1)';
-
-        particles.forEach(p => {
-            p.x += p.vx;
-            p.y += p.vy;
-
-            // Wrapping boundaries
-            if (p.x < 0) p.x = width;
-            if (p.x > width) p.x = 0;
-            if (p.y < 0) p.y = height;
-            if (p.y > height) p.y = 0;
-
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-            ctx.fill();
-        });
-
-        animationFrameId = requestAnimationFrame(render);
-    }
-    render();
 }
 
-// --- Dynamic Content Grids ---
-function loadContentGrid() {
-    const grid = document.getElementById('content-grid');
-    if (!grid) return;
-
-    const path = window.location.pathname;
-    let items = [];
-
-    if (path.includes('games.html')) {
-        items = masterCatalog.games;
-    } else if (path.includes('media.html')) {
-        items = masterCatalog.media;
+// --- Data Logic (Favorites & Recent) ---
+function toggleFavorite(id, title, img, src) {
+    let favorites = JSON.parse(localStorage.getItem('hub_favorites_v2')) || [];
+    const index = favorites.findIndex(f => f.id === id);
+    
+    if (index > -1) {
+        favorites.splice(index, 1);
     } else {
-        items = [...masterCatalog.games, ...masterCatalog.media];
+        favorites.push({ id, title, img, src });
     }
-
-    renderCards(grid, items);
+    
+    localStorage.setItem('hub_favorites_v2', JSON.stringify(favorites));
+    updateStarUI();
+    loadFavoritesGrid(); // Re-render if on favorites page
 }
 
-function renderCards(container, items) {
-    const favorites = JSON.parse(localStorage.getItem('hub_favorites')) || [];
+function trackRecent(title, img, src, id) {
+    let recent = JSON.parse(localStorage.getItem('hub_recent')) || [];
+    recent = recent.filter(item => item.id !== id);
+    recent.unshift({ title, img, src, id });
+    if (recent.length > 4) recent.pop();
+    localStorage.setItem('hub_recent', JSON.stringify(recent));
+}
 
-    if (items.length === 0) {
-        container.innerHTML = `<div style="color: var(--text-muted); font-size: 0.95rem; padding: 20px 0; grid-column: 1 / -1;">No items available yet. Add items to your catalog in script.js!</div>`;
+// --- Grid Renderers for Dynamic Pages (Recent/Favorites) ---
+function generateCardHTML(item) {
+    return `
+        <div class="card" data-id="${item.id}" data-title="${item.title}" data-img="${item.img}" data-src="${item.src}">
+            <button class="fav-btn">☆</button>
+            <a href="./play.html?src=${encodeURIComponent(item.src)}&title=${encodeURIComponent(item.title)}&id=${item.id}" class="play-link" style="text-decoration: none; color: inherit; display: flex; flex-direction: column; flex: 1;">
+                <div class="card-img-container"><img src="${item.img}" alt="${item.title}"></div>
+                <div class="card-title">${item.title}</div>
+            </a>
+        </div>
+    `;
+}
+
+function loadFavoritesGrid() {
+    const favGrid = document.getElementById('favorites-grid');
+    if (!favGrid) return;
+
+    const favorites = JSON.parse(localStorage.getItem('hub_favorites_v2')) || [];
+    if (favorites.length === 0) {
+        favGrid.innerHTML = `<div style="color: var(--text-muted); font-size: 0.9rem; padding: 10px 0;">No favorite items added yet. Click the star icon on any card to save it here!</div>`;
         return;
     }
+    favGrid.innerHTML = favorites.map(item => generateCardHTML(item)).join('');
+    updateStarUI();
+}
 
-    container.innerHTML = items.map(item => {
-        const isFav = favorites.includes(item.id);
-        return `
-            <div class="card" data-title="${item.title.toLowerCase()}">
-                <button class="fav-btn ${isFav ? 'active' : ''}" onclick="toggleFavorite(event, '${item.id}')">${isFav ? '★' : '☆'}</button>
-                <a href="./play.html?src=${encodeURIComponent(item.src)}&title=${encodeURIComponent(item.title)}&id=${item.id}" onclick="trackRecent('${item.title}', '${item.img}', '${item.src}', '${item.id}')" style="text-decoration: none; color: inherit; display: flex; flex-direction: column; flex: 1;">
-                    <div class="card-img-container"><img src="${item.img}" alt="${item.title}"></div>
-                    <div class="card-title">${item.title}</div>
-                </a>
-            </div>
-        `;
-    }).join('');
+function loadRecentlyPlayed() {
+    const recentGrid = document.getElementById('recent-grid');
+    if (!recentGrid) return;
+    
+    const recent = JSON.parse(localStorage.getItem('hub_recent')) || [];
+    if (recent.length === 0) {
+        recentGrid.innerHTML = `<div style="color: var(--text-muted); font-size: 0.9rem; padding: 10px 0;">No recently played items yet. Jump into one below!</div>`;
+        return;
+    }
+    recentGrid.innerHTML = recent.map(item => generateCardHTML(item)).join('');
+    updateStarUI();
 }
 
 // --- Search Bar Filter ---
@@ -233,12 +190,8 @@ function initSearch() {
         const cards = document.querySelectorAll('#content-grid .card');
 
         cards.forEach(card => {
-            const title = card.getAttribute('data-title') || '';
-            if (title.includes(query)) {
-                card.style.display = 'flex';
-            } else {
-                card.style.display = 'none';
-            }
+            const title = (card.getAttribute('data-title') || '').toLowerCase();
+            card.style.display = title.includes(query) ? 'flex' : 'none';
         });
     });
 }
@@ -258,7 +211,6 @@ function initGitHubAuth() {
 
     githubBtn.addEventListener('click', () => {
         const currentSession = JSON.parse(localStorage.getItem('hub_user_session'));
-        
         if (currentSession) {
             localStorage.removeItem('hub_user_session');
             githubBtn.textContent = 'Sign in with GitHub';
@@ -280,85 +232,59 @@ function initGitHubAuth() {
     });
 }
 
-// --- Favorites System ---
-window.toggleFavorite = function(event, gameId) {
-    event.stopPropagation();
-    event.preventDefault();
-    
-    let favorites = JSON.parse(localStorage.getItem('hub_favorites')) || [];
-    const index = favorites.indexOf(gameId);
-    
-    const btn = event.currentTarget;
-    if (index > -1) {
-        favorites.splice(index, 1);
-        btn.classList.remove('active');
-        btn.textContent = '☆';
-    } else {
-        favorites.push(gameId);
-        btn.classList.add('active');
-        btn.textContent = '★';
-    }
-    
-    localStorage.setItem('hub_favorites', JSON.stringify(favorites));
-    loadFavoritesGrid();
-};
+// --- Background Particle Canvas Engine ---
+function initCanvas() {
+    const canvas = document.getElementById('bg-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
 
-function loadFavoritesGrid() {
-    const favGrid = document.getElementById('favorites-grid');
-    if (!favGrid) return;
+    if (animationFrameId) cancelAnimationFrame(animationFrameId);
 
-    const favorites = JSON.parse(localStorage.getItem('hub_favorites')) || [];
-    
-    if (favorites.length === 0) {
-        favGrid.innerHTML = `<div style="color: var(--text-muted); font-size: 0.9rem; padding: 10px 0;">No favorite items added yet. Click the star icon on any card to save it here!</div>`;
-        return;
+    let width = canvas.width = window.innerWidth;
+    let height = canvas.height = window.innerHeight;
+
+    window.addEventListener('resize', () => {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+    });
+
+    const mode = localStorage.getItem('hub_particles') || 'default';
+    if (mode === 'none') {
+        ctx.clearRect(0, 0, width, height);
+        return; 
     }
 
-    const allItems = [...masterCatalog.games, ...masterCatalog.media];
-    const favoriteItems = allItems.filter(item => favorites.includes(item.id));
+    let particles = [];
+    let count = mode === 'snow' ? 100 : (mode === 'fast' ? 70 : 40);
 
-    favGrid.innerHTML = favoriteItems.map(item => `
-        <div class="card" data-game-id="${item.id}">
-            <button class="fav-btn active" onclick="toggleFavorite(event, '${item.id}')">★</button>
-            <a href="./play.html?src=${encodeURIComponent(item.src)}&title=${encodeURIComponent(item.title)}&id=${item.id}" onclick="trackRecent('${item.title}', '${item.img}', '${item.src}', '${item.id}')" style="text-decoration: none; color: inherit; display: flex; flex-direction: column; flex: 1;">
-                <div class="card-img-container"><img src="${item.img}" alt="${item.title}"></div>
-                <div class="card-title">${item.title}</div>
-            </a>
-        </div>
-    `).join('');
-}
-
-// --- Recently Played Tracking ---
-window.trackRecent = function(title, img, src, id) {
-    let recent = JSON.parse(localStorage.getItem('hub_recent')) || [];
-    recent = recent.filter(item => item.id !== id);
-    recent.unshift({ title, img, src, id });
-    if (recent.length > 4) recent.pop();
-    localStorage.setItem('hub_recent', JSON.stringify(recent));
-};
-
-function loadRecentlyPlayed() {
-    const recentGrid = document.getElementById('recent-grid');
-    if (!recentGrid) return;
-    const recent = JSON.parse(localStorage.getItem('hub_recent')) || [];
-    
-    if (recent.length === 0) {
-        recentGrid.innerHTML = `<div style="color: var(--text-muted); font-size: 0.9rem; padding: 10px 0;">No recently played items yet. Jump into one below!</div>`;
-        return;
+    for (let i = 0; i < count; i++) {
+        particles.push({
+            x: Math.random() * width,
+            y: Math.random() * height,
+            vx: mode === 'fast' ? (Math.random() - 0.5) * 8 : (Math.random() - 0.5) * 0.5,
+            vy: mode === 'snow' ? Math.random() * 2 + 1 : (mode === 'fast' ? (Math.random() - 0.5) * 8 : (Math.random() - 0.5) * 0.5),
+            radius: mode === 'snow' ? Math.random() * 2 + 1 : Math.random() * 1.5 + 0.5
+        });
     }
 
-    const favorites = JSON.parse(localStorage.getItem('hub_favorites')) || [];
+    function render() {
+        ctx.clearRect(0, 0, width, height);
+        ctx.fillStyle = mode === 'snow' ? 'rgba(255, 255, 255, 0.4)' : 'rgba(255, 255, 255, 0.1)';
 
-    recentGrid.innerHTML = recent.map(game => {
-        const isFav = favorites.includes(game.id);
-        return `
-            <div class="card" data-game-id="${game.id}">
-                <button class="fav-btn ${isFav ? 'active' : ''}" onclick="toggleFavorite(event, '${game.id}')">${isFav ? '★' : '☆'}</button>
-                <a href="./play.html?src=${encodeURIComponent(game.src)}&title=${encodeURIComponent(game.title)}&id=${game.id}" onclick="trackRecent('${game.title}', '${game.img}', '${game.src}', '${game.id}')" style="text-decoration: none; color: inherit; display: flex; flex-direction: column; flex: 1;">
-                    <div class="card-img-container"><img src="${game.img}" alt="${game.title}"></div>
-                    <div class="card-title">${game.title}</div>
-                </a>
-            </div>
-        `;
-    }).join('');
+        particles.forEach(p => {
+            p.x += p.vx;
+            p.y += p.vy;
+            if (p.x < 0) p.x = width;
+            if (p.x > width) p.x = 0;
+            if (p.y < 0) p.y = height;
+            if (p.y > height) p.y = 0;
+
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+            ctx.fill();
+        });
+
+        animationFrameId = requestAnimationFrame(render);
+    }
+    render();
 }
