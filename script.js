@@ -1,9 +1,46 @@
 // script.js - Unified Hub Logic
 
-// Master Catalog (Empty - add your actual games and media links here)
+// Master Catalog - Add your actual games and media links here
 const masterCatalog = {
-    games: [],
-    media: []
+    games: [
+        { 
+            id: 'game-1', 
+            title: 'Subway Surfers', 
+            img: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=500&auto=format&fit=crop&q=60', 
+            src: 'https://math-games-9m2.pages.dev/subway-surfers', 
+            category: 'games' 
+        },
+        { 
+            id: 'game-2', 
+            title: 'Minecraft Classic', 
+            img: 'https://images.unsplash.com/photo-1614316311790-1c6f71d53e20?w=500&auto=format&fit=crop&q=60', 
+            src: 'https://classic.minecraft.net/', 
+            category: 'games' 
+        },
+        { 
+            id: 'game-3', 
+            title: 'Slope', 
+            img: 'https://images.unsplash.com/photo-1552820728-8b83bb6b773f?w=500&auto=format&fit=crop&q=60', 
+            src: 'https://math-games-9m2.pages.dev/slope', 
+            category: 'games' 
+        }
+    ],
+    media: [
+        { 
+            id: 'media-1', 
+            title: 'Lo-Fi Radio', 
+            img: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=500&auto=format&fit=crop&q=60', 
+            src: 'https://www.youtube.com/embed/jfKfPfyJRdk', 
+            category: 'media' 
+        },
+        { 
+            id: 'media-2', 
+            title: 'Anime Stream', 
+            img: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=500&auto=format&fit=crop&q=60', 
+            src: 'https://www.youtube.com/embed/5qap5aO4i9A', 
+            category: 'media' 
+        }
+    ]
 };
 
 // Global canvas animation frame tracker
